@@ -1,7 +1,9 @@
 package com.example.greenplate.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,10 @@ public class LoginView extends AppCompatActivity {
         loginScreenBinding.setLoginViewModel(new LoginViewModel());
 
         loginScreenBinding.executePendingBindings();
+
+        loginScreenBinding.loginButton.setOnClickListener(v -> {
+            loginScreenBinding.getLoginViewModel().onLoginClicked();
+        });
     }
 
     @BindingAdapter({"toastMessage"})
@@ -28,5 +34,12 @@ public class LoginView extends AppCompatActivity {
             Toast.makeText(view.getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void onCreateAccountClicked(View view) {
+        Intent intent = new Intent(this, AccountCreationView.class);
+        startActivity(intent);
+    }
+
+
 
 }

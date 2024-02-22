@@ -25,7 +25,9 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@={loginViewModel.userUsername}"
-                android:autofillHints="Username"/>
+                android:autofillHints="Username"
+                />
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,12 +37,20 @@
                 android:autofillHints="Password"/>
 
             <Button
+                android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:onClick="@{() -> loginViewModel.onLoginClicked()}"
                 android:text="LOGIN"
-                android:toastMessage="@{loginViewModel.toastMessage}" />
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New User? Create Account"
+                android:onClick="onCreateAccountClicked" />
+
         </LinearLayout>
     </ScrollView>
 </layout>

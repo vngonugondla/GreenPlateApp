@@ -5,6 +5,7 @@ import androidx.databinding.Bindable;
 import android.util.Patterns;
 import android.text.TextUtils;
 import com.example.greenplate.BR;
+import com.example.greenplate.model.User;
 
 public class LoginViewModel extends BaseObservable {
     private User user;
