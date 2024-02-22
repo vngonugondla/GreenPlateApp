@@ -25,6 +25,9 @@ public class LoginView extends AppCompatActivity {
 
         loginScreenBinding.loginButton.setOnClickListener(v -> {
             loginScreenBinding.getLoginViewModel().onLoginClicked();
+            if (loginScreenBinding.getLoginViewModel().isInputDataValid()) {
+                navigateToHomePage();
+            }
         });
     }
 
@@ -40,6 +43,11 @@ public class LoginView extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    private void navigateToHomePage() {
+        Intent intent = new Intent(this, Home.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
 
 }

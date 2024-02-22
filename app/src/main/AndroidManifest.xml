@@ -32,6 +32,14 @@
         </activity>
         <activity android:name=".views.InputMealView" />
         <activity android:name=".views.AccountCreationView" />
-        <activity android:name=".views.LoginView"/>
+        <activity
+            android:name=".views.LoginView"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
