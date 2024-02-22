@@ -19,7 +19,7 @@ public class Home extends AppCompatActivity implements BottomNavigationView.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //Implement navigation bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }
@@ -28,7 +28,7 @@ public class Home extends AppCompatActivity implements BottomNavigationView.OnNa
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.Home) {
-            startActivity(new Intent(Home.this, Home.class));
+            //startActivity(new Intent(Home.this, Home.class));
             return true;
         } else if (id == R.id.Recipe) {
             startActivity(new Intent(Home.this, RecipeView.class));
