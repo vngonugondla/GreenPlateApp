@@ -16,7 +16,7 @@ import com.example.greenplate.viewmodels.AccountCreationViewModel;
 
 public class AccountCreationView extends AppCompatActivity {
 
-    private EditText editTextUsername, editTextEmail, editTextPassword;
+    private EditText editTextUsername, editTextPassword;
     private Button buttonCreateAccount;
     private AccountCreationViewModel viewModel;
 
@@ -28,7 +28,6 @@ public class AccountCreationView extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(AccountCreationViewModel.class);
 
         editTextUsername = findViewById(R.id.editTextUsername);
-        editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonCreateAccount = findViewById(R.id.buttonCreateAccount);
 
@@ -38,7 +37,6 @@ public class AccountCreationView extends AppCompatActivity {
 
                 viewModel.setUser(new User(
                         editTextUsername.getText().toString().trim(),
-                        editTextEmail.getText().toString().trim(),
                         editTextPassword.getText().toString().trim()
                 ));
 
