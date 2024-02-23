@@ -38,4 +38,5 @@ public class AccountCreationViewModel extends ViewModel {
     public void createAccount() {
         // placeholder, need to implement later
     }
+
 }
