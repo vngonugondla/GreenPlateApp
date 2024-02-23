@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import com.example.greenplate.BR;
 import com.example.greenplate.model.User;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class LoginViewModel extends BaseObservable {
     private User user;
 
