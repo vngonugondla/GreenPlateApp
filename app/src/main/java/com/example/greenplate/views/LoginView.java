@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil;
 import com.example.greenplate.databinding.LoginScreenBinding;
 import com.example.greenplate.R;
 import com.example.greenplate.viewmodels.LoginViewModel;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -23,7 +24,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginView extends AppCompatActivity {
 
-    //create shared instance of firebaseAuth
     private FirebaseAuth mAuth;
 
     private EditText editTextLoginUsername;
@@ -41,13 +41,13 @@ public class LoginView extends AppCompatActivity {
 
         loginScreenBinding.executePendingBindings();
 
-        //Initialize view elements
+
+  
         editTextLoginUsername = findViewById(R.id.editTextLoginUsername);
         editTextLoginPassword = findViewById(R.id.editTextPassword);
         buttonNewUser = findViewById(R.id.new_user);
         buttonLogin = findViewById(R.id.login_button);
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         loginScreenBinding.loginButton.setOnClickListener(v -> {
@@ -61,6 +61,7 @@ public class LoginView extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public void onStart() {
