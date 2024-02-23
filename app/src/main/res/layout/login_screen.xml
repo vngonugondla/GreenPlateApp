@@ -21,20 +21,24 @@
             android:orientation="vertical">
 
             <EditText
+                android:id="@+id/editTextLoginUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="@={loginViewModel.userUsername}"
                 android:autofillHints="Username"
-                />
+                android:hint="@string/login_username"
+                android:padding="16dp"
+                android:text="@={loginViewModel.userUsername}" />
 
             <EditText
+                android:id="@+id/editTextLoginPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:autofillHints="Password"
+                android:hint="@string/login_password"
                 android:inputType="textPassword"
-                android:text="@={loginViewModel.userPassword}"
-                android:autofillHints="Password"/>
+                android:padding="16dp"
+                android:selectAllOnFocus="false"
+                android:text="@={loginViewModel.userPassword}" />
 
             <Button
                 android:id="@+id/login_button"
@@ -46,9 +50,10 @@
                 />
 
             <Button
+                android:id="@+id/new_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New User? Create Account"
+                android:text="@string/new_user_create_account"
                 android:onClick="onCreateAccountClicked" />
 
         </LinearLayout>
