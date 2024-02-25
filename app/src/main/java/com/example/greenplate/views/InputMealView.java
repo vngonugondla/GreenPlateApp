@@ -27,6 +27,7 @@ public class InputMealView extends AppCompatActivity implements BottomNavigation
             startActivity(new Intent(InputMealView.this, Home.class));
             return true;
         } else if (id == R.id.Recipe) {
+            startActivity(new Intent(InputMealView.this, RecipeView.class));
             return true;
         } else if (id == R.id.InputMeal) {
             return true;
