@@ -1,5 +1,6 @@
 package com.example.greenplate.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -64,6 +65,16 @@ public class AccountCreationView extends AppCompatActivity {
                     Toast.makeText(AccountCreationView.this,
                             "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        loginNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AccountCreationView.this, LoginView.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             }
         });
     }
