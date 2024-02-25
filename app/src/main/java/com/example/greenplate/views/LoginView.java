@@ -60,6 +60,9 @@ public class LoginView extends AppCompatActivity {
                 navigateToHomePage();
             }
         });
+
+        Button exitButton = findViewById(R.id.exit_button);
+        exitButton.setOnClickListener(v -> exitApp(v));
     }
 
 
@@ -74,7 +77,6 @@ public class LoginView extends AppCompatActivity {
         }
     }
 
-    //user signs in
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -112,4 +114,7 @@ public class LoginView extends AppCompatActivity {
         finish();
     }
 
+    public void exitApp(View view) {
+        finishAffinity();
+    }
 }
