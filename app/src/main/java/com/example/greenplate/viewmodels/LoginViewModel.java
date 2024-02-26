@@ -59,10 +59,19 @@ public class LoginViewModel extends BaseObservable {
     }
 
     public boolean isInputDataValid() {
-        return !TextUtils.isEmpty(getUserUsername())
-                &&
-                Patterns.EMAIL_ADDRESS.matcher(getUserUsername()).matches()
-                && getUserPassword().length() > 5;
+        //return !TextUtils.isEmpty(getUserUsername()) && Patterns.EMAIL_ADDRESS.matcher(getUserUsername()).matches() && getUserPassword().length() > 5;
+        String username = getUserUsername();
+        String password = getUserPassword();
+
+        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+            return false;
+        }
+
+        if (TextUtils.isEmpty(username.trim()) || TextUtils.isEmpty(password.trim())) {
+            return false;
+        }
+
+        return password.length() >= 5;
     }
 
 }
