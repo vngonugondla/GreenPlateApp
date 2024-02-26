@@ -59,7 +59,6 @@ public class LoginViewModel extends BaseObservable {
     }
 
     public boolean isInputDataValid() {
-        //return !TextUtils.isEmpty(getUserUsername()) && Patterns.EMAIL_ADDRESS.matcher(getUserUsername()).matches() && getUserPassword().length() > 5;
         String username = getUserUsername();
         String password = getUserPassword();
 
