@@ -7,13 +7,12 @@ import android.os.Bundle;
 import com.example.greenplate.R;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class Home extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class Home extends AppCompatActivity implements
+        BottomNavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

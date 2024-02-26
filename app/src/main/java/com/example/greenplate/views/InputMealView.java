@@ -11,7 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.greenplate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class InputMealView extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class InputMealView extends AppCompatActivity
+        implements BottomNavigationView.OnNavigationItemSelectedListener {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
