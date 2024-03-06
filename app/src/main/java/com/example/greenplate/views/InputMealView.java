@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,10 +47,10 @@ public class InputMealView extends AppCompatActivity {
                 String mealName = editMealText.getText().toString().trim();
                 String calorieText = editCalorieText.getText().toString().trim();
                 if (viewModel != null) {
-                    viewModel.saveMealToFirebase();
+                //  viewModel.saveMealToFirebase();
                 } else {
-                    viewModel = new ViewModelProvider(InputMealView.this).get(InputMealViewModel.class);
-                    viewModel.saveMealToFirebase();
+                 // viewModel = new ViewModelProvider(InputMealView.this).get(InputMealViewModel.class);
+                  //viewModel.saveMealToFirebase();
                 }
             }
         });  /*
