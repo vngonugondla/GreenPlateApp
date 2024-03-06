@@ -47,23 +47,16 @@ public class InputMealView extends AppCompatActivity {
             public void onClick(View view) {
                 String mealName = editMealText.getText().toString().trim();
                 String calorieText = editCalorieText.getText().toString().trim();
-                /*
-                if (viewModel.isValidInput()) {
-                    viewModel.createAccount();
-                    //creates an account
-                    createAccount(editTextUsername.getText().toString().trim(),
-                            editTextPassword.getText().toString().trim());
+                if (viewModel != null) {
+                    viewModel.saveMealToFirebase();
                 } else {
-                    Toast.makeText(InputMealView.this,
-                            "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    viewModel = new ViewModelProvider(InputMealView.this).get(InputMealViewModel.class);
+                    viewModel.saveMealToFirebase();
                 }
-                 */
             }
-        });
-
-        /*
+        });  /*
         @Override
-        public boolean onNavigationItemSelected (@NonNull MenuItem item) {
+        public boolean onNavigationItemSelected (@NonNull MenuItem item){
             int id = item.getItemId();
             if (id == R.id.Home) {
                 startActivity(new Intent(InputMealView.this, Home.class));
@@ -79,7 +72,6 @@ public class InputMealView extends AppCompatActivity {
                 return true;
             }
             return false;
-        }
-        */
+        } */
     }
 }
