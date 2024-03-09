@@ -51,7 +51,7 @@ public class InputMealView extends AppCompatActivity implements
                         int calorieValue = Integer.parseInt(calorieText);
                         DatabaseReference newMealRef = root.push();
                         newMealRef.child("Meal Name").setValue(mealName);
-                        newMealRef.child("Calories").setValue(calorieText)
+                        newMealRef.child("Calories").setValue(calorieValue)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {

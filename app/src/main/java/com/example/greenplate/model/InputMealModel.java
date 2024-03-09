@@ -8,6 +8,7 @@ public class InputMealModel {
     private String mealName;
     private int calories;
     public InputMealModel(String mealName, int calories) {
+        this.mealName = mealName;
         this.calories = calories;
     }
 
