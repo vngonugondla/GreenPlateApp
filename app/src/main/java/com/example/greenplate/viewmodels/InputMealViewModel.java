@@ -20,31 +20,16 @@ public class InputMealViewModel extends ViewModel {
     }
 
     public void setInputMealModel(InputMealModel newMeal) {
-        if (newMeal.getMealName() != null) {
+        if (this.isValidInput(newMeal)) {
             meal.setMealName(newMeal.getMealName());
-        }
-        if (Integer.toString(newMeal.getCalories()) != null) {
             meal.setCalories(newMeal.getCalories());
         }
     }
-
-    public String getMealName() {
-        return meal.getMealName();
-    }
-
-    public int getCalories() {
-        return meal.getCalories();
-    }
-
-    public boolean isValidInput() {
-
-        String name = meal.getMealName();
-        int calories = meal.getCalories();
-
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(Integer.toString(calories))) {
-            return false;
-        }
-        return true;
+    public boolean isValidInput(InputMealModel newMeal) {
+       if (newMeal == null || newMeal.getMealName() == null || newMeal.getMealName().isEmpty()) {
+           return false;
+       }
+       return true;
     }
 
 }

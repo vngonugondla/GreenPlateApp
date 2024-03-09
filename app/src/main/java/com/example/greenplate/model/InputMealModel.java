@@ -1,4 +1,6 @@
 package com.example.greenplate.model;
+import android.text.TextUtils;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -6,7 +8,6 @@ public class InputMealModel {
     private String mealName;
     private int calories;
     public InputMealModel(String mealName, int calories) {
-        this.mealName = mealName;
         this.calories = calories;
     }
 
@@ -21,7 +22,6 @@ public class InputMealModel {
     public void setMealName(String mealName) {
         this.mealName = mealName;
     }
-
     public void setCalories(int calories) {
         this.calories = calories;
     }
