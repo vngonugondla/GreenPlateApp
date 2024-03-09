@@ -26,15 +26,5 @@ public class InputMealModel {
         this.calories = calories;
     }
 
-    public void saveToFirebase() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("meals");
-        String key = databaseReference.push().getKey();
-
-        if (key != null) {
-            databaseReference.child(key).setValue(this);
-        }
-    }
-
-
 
 }

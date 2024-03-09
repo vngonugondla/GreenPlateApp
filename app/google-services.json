@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "343610000732",
-    "project_id": "greenplate-6254d",
-    "storage_bucket": "greenplate-6254d.appspot.com"
+    "project_number": "675860436502",
+    "project_id": "greenplatemeals",
+    "storage_bucket": "greenplatemeals.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:343610000732:android:a87344d02ae82608806d99",
+        "mobilesdk_app_id": "1:675860436502:android:28c241b247734cb9934737",
         "android_client_info": {
           "package_name": "com.example.greenplate"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDDj6jy-dgs6T85C30JJpaDcZpYNgxUYVg"
+          "current_key": "AIzaSyDXmHRDT_F_aQ9UgTXtOFBriUWiEE6_utk"
         }
       ],
       "services": {
