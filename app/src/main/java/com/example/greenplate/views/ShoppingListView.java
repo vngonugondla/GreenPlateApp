@@ -10,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.greenplate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class ShoppingListView extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class ShoppingListView extends AppCompatActivity
+        implements BottomNavigationView.OnNavigationItemSelectedListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe);
+        setContentView(R.layout.activity_shoppinglist);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }

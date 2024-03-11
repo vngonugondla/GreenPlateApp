@@ -10,7 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.greenplate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class RecipeView extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class RecipeView extends AppCompatActivity
+        implements BottomNavigationView.OnNavigationItemSelectedListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
