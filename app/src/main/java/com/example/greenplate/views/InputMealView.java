@@ -68,30 +68,23 @@ public class InputMealView extends AppCompatActivity implements
                         Toast.makeText(InputMealView.this, "Invalid Calorie Input", Toast.LENGTH_SHORT).show();
                     }
 
-
-                }
-
-            }
-
-        });
-    }
-        public boolean onNavigationItemSelected (@NonNull MenuItem item){
-            int id = item.getItemId();
-            if (id == R.id.Home) {
-                startActivity(new Intent(InputMealView.this, Home.class));
-                return true;
-            } else if (id == R.id.Recipe) {
-                startActivity(new Intent(InputMealView.this, RecipeView.class));
-                return true;
-            } else if (id == R.id.Ingredients) {
-                startActivity(new Intent(InputMealView.this, IngredientsView.class));
-                return true;
-            } else if (id == R.id.ShoppingList) {
-                startActivity(new Intent(InputMealView.this, ShoppingListView.class));
-                return true;
-            }  else if (id == R.id.InputMeal) {
-                return true;
-            }
-            return false;
+    // will need to be updated once personal info screen gets created
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.Home) {
+            startActivity(new Intent(InputMealView.this, Home.class));
+            return true;
+        } else if (id == R.id.Recipe) {
+            startActivity(new Intent(InputMealView.this, RecipeView.class));
+            return true;
+        } else if (id == R.id.InputMeal) {
+            return true;
+        } else if (id == R.id.Ingredients) {
+            startActivity(new Intent(InputMealView.this, IngredientsView.class));
+            return true;
+        } else if (id == R.id.ShoppingList) {
+            startActivity(new Intent(InputMealView.this, ShoppingListView.class));
+            return true;
         }
     }
