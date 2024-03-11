@@ -89,6 +89,8 @@ public class InputMealView extends AppCompatActivity implements
             } else if (id == R.id.ShoppingList) {
                 startActivity(new Intent(InputMealView.this, ShoppingListView.class));
                 return true;
+            }  else if (id == R.id.InputMeal) {
+                return true;
             }
             return false;
         }
