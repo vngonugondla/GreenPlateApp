@@ -20,6 +20,7 @@ public class InputMealView extends AppCompatActivity implements BottomNavigation
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }
 
+    // will need to be updated once personal info screen gets created
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
