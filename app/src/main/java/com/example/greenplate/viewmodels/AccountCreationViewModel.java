@@ -29,11 +29,7 @@ public class AccountCreationViewModel extends ViewModel {
         String username = user.getUsername();
         String password = user.getPassword();
 
-        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-            return false;
-        }
-
-        if (TextUtils.isEmpty(username.trim()) || TextUtils.isEmpty(password.trim())) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             return false;
         }
 
