@@ -22,6 +22,7 @@ public class InputMealView extends AppCompatActivity implements
     private EditText editMealText;
     private EditText editCalorieText;
     private Button enterMealButton;
+    private EditText editDateText;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference root = db.getReference().child("Meals");
@@ -34,6 +35,7 @@ public class InputMealView extends AppCompatActivity implements
         viewModel = new ViewModelProvider(this).get(InputMealViewModel.class);
         editMealText = findViewById(R.id.InputMealName);
         editCalorieText = findViewById(R.id.InputCalories);
+        editDateText = findViewById(R.id.InputDate);
         enterMealButton = findViewById(R.id.InputMealButton);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -42,15 +44,21 @@ public class InputMealView extends AppCompatActivity implements
             public void onClick(View view) {
                 String calorieText =editCalorieText.getText().toString();
                 String mealName = editMealText.getText().toString();
+                String date = editDateText.getText().toString();
                 if (mealName.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (calorieText.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Calories field cannot be empty", Toast.LENGTH_SHORT).show();
+                } else if (date.isEmpty()) {
+                    Toast.makeText(InputMealView.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
+                } else if (date.length() != 10) {
+                    Toast.makeText(InputMealView.this, "Date is in invalid format", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
                         int calorieValue = Integer.parseInt(calorieText);
                         DatabaseReference newMealRef = root.push();
                         newMealRef.child("Meal Name").setValue(mealName);
+                        newMealRef.child("Date").setValue(date);
                         newMealRef.child("Calories").setValue(calorieValue)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
