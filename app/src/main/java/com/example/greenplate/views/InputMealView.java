@@ -46,13 +46,14 @@ public class InputMealView extends AppCompatActivity implements
                 String mealName = editMealText.getText().toString();
                 String date = editDateText.getText().toString();
                 if (mealName.isEmpty()) {
-                    Toast.makeText(InputMealView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this, "The 'Meal Name' cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (calorieText.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Calories field cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (date.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (date.length() != 10) {
                     Toast.makeText(InputMealView.this, "Date is in invalid format", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this, "The 'Calories' field cannot be empty", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
                         int calorieValue = Integer.parseInt(calorieText);
@@ -63,7 +64,7 @@ public class InputMealView extends AppCompatActivity implements
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Toast.makeText(InputMealView.this, "Meal saved", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(InputMealView.this, "Meal saved!", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -76,28 +77,23 @@ public class InputMealView extends AppCompatActivity implements
                         Toast.makeText(InputMealView.this, "Invalid Calorie Input", Toast.LENGTH_SHORT).show();
                     }
 
-
-                }
-
-            }
-
-        });
-    }
-        public boolean onNavigationItemSelected (@NonNull MenuItem item){
-            int id = item.getItemId();
-            if (id == R.id.Home) {
-                startActivity(new Intent(InputMealView.this, Home.class));
-                return true;
-            } else if (id == R.id.Recipe) {
-                startActivity(new Intent(InputMealView.this, RecipeView.class));
-                return true;
-            } else if (id == R.id.Ingredients) {
-                startActivity(new Intent(InputMealView.this, IngredientsView.class));
-                return true;
-            } else if (id == R.id.ShoppingList) {
-                startActivity(new Intent(InputMealView.this, ShoppingListView.class));
-                return true;
-            }
-            return false;
+    // will need to be updated once personal info screen gets created
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.Home) {
+            startActivity(new Intent(InputMealView.this, Home.class));
+            return true;
+        } else if (id == R.id.Recipe) {
+            startActivity(new Intent(InputMealView.this, RecipeView.class));
+            return true;
+        } else if (id == R.id.InputMeal) {
+            return true;
+        } else if (id == R.id.Ingredients) {
+            startActivity(new Intent(InputMealView.this, IngredientsView.class));
+            return true;
+        } else if (id == R.id.ShoppingList) {
+            startActivity(new Intent(InputMealView.this, ShoppingListView.class));
+            return true;
         }
     }
