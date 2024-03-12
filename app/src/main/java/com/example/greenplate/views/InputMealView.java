@@ -25,8 +25,9 @@ public class InputMealView extends AppCompatActivity implements
     private EditText editDateText;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference root = db.getReference().child("Meals");
+    private DatabaseReference root = db.getReference().child("Meal");
     private InputMealViewModel viewModel;
+    private String mealKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class InputMealView extends AppCompatActivity implements
                 String calorieText =editCalorieText.getText().toString();
                 String mealName = editMealText.getText().toString();
                 String date = editDateText.getText().toString();
+
                 if (mealName.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (calorieText.isEmpty()) {
@@ -63,6 +65,7 @@ public class InputMealView extends AppCompatActivity implements
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        mealKey = newMealRef.getKey();
                                         Toast.makeText(InputMealView.this, "Meal saved", Toast.LENGTH_SHORT).show();
                                     }
                                 })
@@ -100,4 +103,6 @@ public class InputMealView extends AppCompatActivity implements
             }
             return false;
         }
+
+
     }
