@@ -28,4 +28,9 @@ public class AccountCreationViewModelTest {
         viewModel.setUser(new User("username", "123"));
         assertFalse(viewModel.isValidInput());
     }
+    @Test
+    public void whenPasswordIsExactlyFiveCharacters_thenShouldBeConsideredValid() {
+        viewModel.setUser(new User("user", "12345"));
+        assertTrue("Password with exactly 5 characters should be considered valid.", viewModel.isValidInput());
+    }
 }
