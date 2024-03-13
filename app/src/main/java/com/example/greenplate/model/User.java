@@ -12,10 +12,14 @@ public class User {
     private String height;
     private String weight;
     private String gender;
+    public static User singleton;
 
-    public User(String username, String password) {
+    private User(String username, String password, String height, String weight, String gender) {
         this.username = "";
         this.password = "";
+        this.height = "";
+        this.weight = "";
+        this.gender = "";
     }
 
     public String getUsername() {
@@ -54,6 +58,18 @@ public class User {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+    public static User getInstance() {
+        if (singleton == null) {
+            synchronized (User.class) {
+                if (singleton == null) {
+                    singleton = new User("","","","","");
+                }
+            }
+        }
+        return singleton;
+    }
+
 
 
 }

@@ -47,7 +47,7 @@ public class LoginViewModel extends BaseObservable {
     }
 
     public LoginViewModel() {
-        user = new User("", "");
+        user = User.getInstance();
     }
 
     public void onLoginClicked() {

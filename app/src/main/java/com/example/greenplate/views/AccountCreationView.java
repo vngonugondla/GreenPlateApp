@@ -31,6 +31,7 @@ public class AccountCreationView extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     private TextView loginNow;
+    private User user = User.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +51,9 @@ public class AccountCreationView extends AppCompatActivity {
         buttonCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                viewModel.setUser(new User(
-                        editTextUsername.getText().toString().trim(),
-                        editTextPassword.getText().toString().trim()
-                ));
-
+                User user = User.getInstance();
+                editTextUsername.getText().toString().trim();
+                editTextPassword.getText().toString().trim();
                 if (viewModel.isValidInput()) {
                     viewModel.createAccount();
                     //creates an account
