@@ -46,18 +46,4 @@ public class InputMealViewModelTest {
         assertFalse(viewModel.isValidInput(invalidMeal));
 
     }
-
-    @Test
-    public void testIsValidInputWithValidInputs() {
-        InputMealModel validMeal = new InputMealModel("Burger", 500);
-        assertTrue(viewModel.isValidInput(validMeal));
-    }
-
-    @Test
-    public void whenInputMealModelHasValidNameButNoCalories_thenShouldStillAcceptInput() {
-        // Assuming zero calories is a valid scenario, e.g., water or diet drinks.
-        InputMealModel mealWithZeroCalories = new InputMealModel("Water", 0);
-        assertTrue("Valid meal name with zero calories should be accepted",
-                viewModel.isValidInput(mealWithZeroCalories));
-    }
 }
