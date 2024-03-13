@@ -88,7 +88,7 @@ public class InputMealView extends AppCompatActivity implements
             startActivity(new Intent(InputMealView.this, RecipeView.class));
             return true;
         } else if (id == R.id.InputMeal) {
-            return true;
+            return true; //ensures we can navigate to input meal screen from input meal screen
         } else if (id == R.id.Ingredients) {
             startActivity(new Intent(InputMealView.this, IngredientsView.class));
             return true;
