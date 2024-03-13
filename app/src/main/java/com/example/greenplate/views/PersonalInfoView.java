@@ -49,49 +49,6 @@ public class PersonalInfoView extends AppCompatActivity implements
         enterUserButton = findViewById(R.id.InputInfo);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-//        enterUserButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String height =editHeight.getText().toString();
-//                String weight =editWeight.getText().toString();
-//                String gender =editGender.getText().toString();
-//
-//                if (height.isEmpty()) {
-//                    Toast.makeText(PersonalInfoView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
-//                } else if (weight.isEmpty()) {
-//                    Toast.makeText(PersonalInfoView.this, "Calories field cannot be empty", Toast.LENGTH_SHORT).show();
-//                } else if (gender.isEmpty()) {
-//                    Toast.makeText(PersonalInfoView.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    try {
-//                        //int calorieValue = Integer.parseInt(calorieText);
-//                        DatabaseReference newMealRef = root.push();
-//                        newMealRef.child("Height").setValue(height);
-//                        newMealRef.child("Weight").setValue(weight);
-//                        newMealRef.child("Gender").setValue(gender);
-//                        newMealRef.child("Meals").setValue("h")
-//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void unused) {
-//                                        Toast.makeText(PersonalInfoView.this, "User saved", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                })
-//                                .addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Toast.makeText(PersonalInfoView.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                    } catch (NumberFormatException e) {
-//                        Toast.makeText(PersonalInfoView.this, "Invalid User Input", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//
-//                }
-//
-//            }
-//
-//        });
 
         // Inside PersonalInfoView.java
         enterUserButton.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +78,10 @@ public class PersonalInfoView extends AppCompatActivity implements
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Toast.makeText(PersonalInfoView.this, "Information saved successfully", Toast.LENGTH_SHORT).show();
+                                        // Inside PersonalInfoView.java, inside the onSuccessListener of saving data
+                                        Intent intent = new Intent(PersonalInfoView.this, InputMealView.class);
+                                        startActivity(intent);
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

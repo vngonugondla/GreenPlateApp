@@ -66,7 +66,8 @@ public class InputMealView extends AppCompatActivity implements
         dailyCalorieIntakeTextView = findViewById(R.id.dailyCalorieIntakeTextView);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        String username = user.getUsername();
+        String username1 = User.getInstance().getUsername();
+        String username = username1.split("@")[0].replaceAll("[.#$\\[\\]]", "");
         userRef = db.getReference().child("Users").child(username);
         mealsRef = db.getReference().child("Users").child(username).child("Meals");
         enterMealButton.setOnClickListener(new View.OnClickListener() {
@@ -129,8 +130,16 @@ public class InputMealView extends AppCompatActivity implements
                 }
             }
         });
-        retrieveUserInfoAndCalculateCalorieGoal();
-        calculateAndDisplayDailyCalorieIntake();
+//        retrieveUserInfoAndCalculateCalorieGoal();
+//        calculateAndDisplayDailyCalorieIntake();
+        Button showInfoButton = findViewById(R.id.showInfoButton);
+        showInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                retrieveUserInfoAndCalculateCalorieGoal();
+                calculateAndDisplayDailyCalorieIntake();
+            }
+        });
 
     }
         public boolean onNavigationItemSelected (@NonNull MenuItem item){
@@ -158,51 +167,75 @@ public class InputMealView extends AppCompatActivity implements
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String gender = dataSnapshot.child("Gender").getValue(String.class);
-                    int height = dataSnapshot.child("Height").getValue(Integer.class);
-                    int weight = dataSnapshot.child("Weight").getValue(Integer.class);
+                    String gender = dataSnapshot.child("gender").getValue(String.class);
+                    String height = dataSnapshot.child("height").getValue(String.class);
+                    String weight = dataSnapshot.child("weight").getValue(String.class);
 
-                    userInfoTextView.setText("Gender: " + gender + ", Height: " + height + " cm, Weight: " + weight + " kg");
+                    if (gender == null || height == null || weight == null) {
+                        Toast.makeText(InputMealView.this, "One or more user information fields are missing.", Toast.LENGTH_SHORT).show();
+                        return; // Exit if any of the fields are null
+                    }
 
-                    double calorieGoal = calculateCalorieGoal(gender, height, weight);
-                    calorieGoalTextView.setText("Calorie Goal: " + calorieGoal + " kcal");
+                    userInfoTextView.setText(String.format(Locale.US, "Gender: %s, Height: %s cm, Weight: %s kg", gender, height, weight));
+
+                    try {
+                        double calorieGoal = calculateCalorieGoal(gender, height, weight);
+                        calorieGoalTextView.setText(String.format(Locale.US, "Calorie Goal: %.2f kcal", calorieGoal));
+                    } catch (IllegalArgumentException e) {
+                        Toast.makeText(InputMealView.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    //Default values
-                    userInfoTextView.setText("John");
-                    calorieGoalTextView.setText("1000");
+                    // Handle the case where user data is not found
+                    userInfoTextView.setText("User information not available");
+                    calorieGoalTextView.setText("N/A");
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("DatabaseError", "Error: " + databaseError.getMessage());
             }
         });
     }
-    private double calculateCalorieGoal(String gender, int height, int weight) {
+
+
+    private double calculateCalorieGoal(String gender, String heightStr, String weightStr) {
         double bmr;
-        if (gender.equalsIgnoreCase("Male")) {
-            bmr = 66 + (13.75 * weight) + (5 * height);
-        } else if (gender.equalsIgnoreCase("Female")) {
-            bmr = 655 + (9.56 * weight) + (1.85 * height);
-        } else {
-            throw new IllegalArgumentException("Invalid gender specified.");
+        try {
+            double height = Double.parseDouble(heightStr);
+            double weight = Double.parseDouble(weightStr);
+
+            if (gender.equalsIgnoreCase("Male")) {
+                bmr = 66 + (13.75 * weight) + (5 * height) - (6.75 * 25); // Example age 25 used for BMR calculation
+            } else if (gender.equalsIgnoreCase("Female")) {
+                bmr = 655 + (9.56 * weight) + (1.85 * height) - (4.7 * 25); // Example age 25 used for BMR calculation
+            } else {
+                throw new IllegalArgumentException("Invalid gender specified.");
+            }
+            return bmr;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Height and weight must be valid numbers.");
         }
-        return bmr;
     }
+
 
     private void calculateAndDisplayDailyCalorieIntake() {
         Date currentDate = Calendar.getInstance().getTime();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        // Update this to match the date format stored in your Firebase database
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
         String currentDateStr = dateFormat.format(currentDate);
 
-        mealsRef.orderByChild("Date").equalTo(currentDateStr).addListenerForSingleValueEvent(new ValueEventListener() {
+        mealsRef.orderByChild("date").equalTo(currentDateStr).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int totalCalories = 0;
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot mealSnapshot : dataSnapshot.getChildren()) {
-                        int calories = mealSnapshot.child("Calories").getValue(Integer.class);
-                        totalCalories += calories;
+                        // Make sure to check for null here as well
+                        Integer calories = mealSnapshot.child("calories").getValue(Integer.class);
+                        if (calories != null) {
+                            totalCalories += calories;
+                        }
                     }
                 }
                 dailyCalorieIntakeTextView.setText("Daily Calorie Intake: " + totalCalories + " kcal");
@@ -214,5 +247,6 @@ public class InputMealView extends AppCompatActivity implements
             }
         });
     }
+
 
 }
