@@ -6,6 +6,7 @@ public class User {
 
     private String password;
 
+    // needs to be made private so that user can be a singleton class
     public User(String username, String password) {
         this.username = username;
         this.password = password;
