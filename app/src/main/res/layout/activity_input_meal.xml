@@ -62,4 +62,47 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/InputMealButton" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="-31dp"
+        tools:layout_editor_absoluteY="370dp">
+
+        <!-- User information -->
+        <TextView
+            android:id="@+id/userInfoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="User Information"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <!-- Calorie goal -->
+        <TextView
+            android:id="@+id/calorieGoalTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Calorie Goal"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <!-- Daily calorie intake -->
+        <TextView
+            android:id="@+id/dailyCalorieIntakeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Daily Calorie Intake"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

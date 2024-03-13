@@ -31,6 +31,7 @@ public class InputMealView extends AppCompatActivity implements
     private InputMealViewModel viewModel;
     private String mealKey;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
