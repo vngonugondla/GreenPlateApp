@@ -151,6 +151,9 @@ public class PersonalInfoView extends AppCompatActivity implements
         } else if (id == R.id.ShoppingList) {
             startActivity(new Intent(PersonalInfoView.this, ShoppingListView.class));
             return true;
+        } else if (id == R.id.InputMeal) {
+            //startActivity(new Intent(PersonalInfoView.this, ShoppingListView.class));
+            return true;
         }
         return false;
     }
