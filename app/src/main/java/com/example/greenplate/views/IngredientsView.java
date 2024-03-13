@@ -36,7 +36,7 @@ public class IngredientsView extends AppCompatActivity implements
             startActivity(new Intent(IngredientsView.this, InputMealView.class));
             return true;
         } else if (id == R.id.Ingredients) {
-            //startActivity(new Intent(IngredientsView.this, IngredientsView.class));
+            //startActivity(new Intent(IngredientsView.this, IngredientsView.class)); //commented out for no duplicate create
             return true;
         } else if (id == R.id.ShoppingList) {
             startActivity(new Intent(IngredientsView.this, ShoppingListView.class));
