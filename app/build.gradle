@@ -37,6 +37,10 @@ android {
     }
 }
 
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
+
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -54,5 +58,7 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
+    //implementation 'com.anychart:anychart-android:1.1.2'
+    implementation("com.github.AnyChart:AnyChart-Android:1.1.5")
 
 }
