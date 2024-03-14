@@ -9,6 +9,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
 import com.example.greenplate.R;
 import com.example.greenplate.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,6 +23,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.greenplate.viewmodels.InputMealViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,9 +34,12 @@ import com.example.greenplate.model.MealInfo;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.TreeMap;
 
 public class InputMealView extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener {
@@ -56,6 +66,7 @@ public class InputMealView extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_meal);
+
         viewModel = new ViewModelProvider(this).get(InputMealViewModel.class);
         editMealText = findViewById(R.id.InputMealName);
         editCalorieText = findViewById(R.id.InputCalories);
@@ -115,7 +126,7 @@ public class InputMealView extends AppCompatActivity implements
 
                 // Sanitize the username to create a valid Firebase key
                 String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
-
+                setupViz1Button(sanitizedUsername);
                 // Locate the user's entry in the "Users" table and add the meal information
                 DatabaseReference userMealsRef = FirebaseDatabase.getInstance().getReference("Users").child(sanitizedUsername).child("Meals");
 
@@ -242,6 +253,90 @@ public class InputMealView extends AppCompatActivity implements
             }
         });
     }
+
+    private void setupViz1Button(String currentUser) {
+
+        Button viz1Button = findViewById(R.id.button);
+        viz1Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchCaloricIntakeAndDisplayChart(currentUser);
+                Log.d("Viz1Button", "Button clicked");
+            }
+        });
+    }
+
+    private void fetchCaloricIntakeAndDisplayChart(String currentUser) {
+        if (currentUser == null) {
+            Log.d("ChartDebug", "No user is currently signed in.");
+            Toast.makeText(this, "No user is currently signed in.", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if no user is signed in
+        }
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(currentUser).child("Meals");
+
+        Calendar calendar = Calendar.getInstance();
+        // Adjust the date format here
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        calendar.add(Calendar.MONTH, -1);
+        String startDate = sdf.format(calendar.getTime()); // one month ago
+        String endDate = sdf.format(new Date()); // today
+
+        Log.d("ChartDebug", "Querying database from " + startDate + " to " + endDate);
+
+        ref.orderByChild("date").startAt(startDate).endAt(endDate).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                TreeMap<String, Integer> dailyCaloricIntakeMap = new TreeMap<>();
+                for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
+                    MealInfo meal = mealSnapshot.getValue(MealInfo.class);
+                    if (meal != null && meal.getDate() != null) {
+                        int calories = meal.getCalories();
+                        dailyCaloricIntakeMap.put(meal.getDate(),
+                                dailyCaloricIntakeMap.getOrDefault(meal.getDate(), 0) + calories);
+
+                        Log.d("ChartDebug", "Found entry: Date=" + meal.getDate() + ", Calories=" + calories);
+                    }
+                }
+
+                if (dailyCaloricIntakeMap.isEmpty()) {
+                    Log.d("ChartDebug", "No data found for the specified period.");
+                }
+
+                List<Integer> dailyCaloricIntake = new ArrayList<>(dailyCaloricIntakeMap.values());
+                List<String> dateLabels = new ArrayList<>(dailyCaloricIntakeMap.keySet());
+                createCaloricIntakeChart(dateLabels, dailyCaloricIntake);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("DBError", "Database query cancelled", error.toException());
+            }
+        });
+    }
+
+
+
+
+    private void createCaloricIntakeChart(List<String> dateLabels, List<Integer> dailyCaloricIntake) {
+        Cartesian columnChart = AnyChart.column();
+        List<DataEntry> data = new ArrayList<>();
+        for (int i = 0; i < dailyCaloricIntake.size(); i++) {
+            // Use dateLabels for the x-axis
+            data.add(new ValueDataEntry(dateLabels.get(i), dailyCaloricIntake.get(i)));
+        }
+        columnChart.data(data);
+
+        columnChart.title("Daily Caloric Intake Over Past Month");
+        columnChart.xAxis(0).title("Date");
+        columnChart.yAxis(0).title("Calories");
+
+        AnyChartView anyChartView = findViewById(R.id.any_chart_view);
+        anyChartView.setChart(columnChart);
+    }
+
+
+
 
 
     // will need to be updated once personal info screen gets created
