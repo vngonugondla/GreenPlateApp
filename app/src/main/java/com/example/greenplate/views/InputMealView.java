@@ -70,12 +70,23 @@ public class InputMealView extends AppCompatActivity implements
         String username = username1.split("@")[0].replaceAll("[.#$\\[\\]]", "");
         userRef = db.getReference().child("Users").child(username);
         mealsRef = db.getReference().child("Users").child(username).child("Meals");
+
+        Button personalInfoButton = findViewById(R.id.personalInfoButton);
+
+        // Set onClick listener for the button
+        personalInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to the personal information screen
+                startActivity(new Intent(InputMealView.this, PersonalInfoView.class));
+            }
+        });
         enterMealButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String mealName = editMealText.getText().toString().trim();
-                final String calorieText = editCalorieText.getText().toString().trim();
-                final String date = editDateText.getText().toString().trim();
+                String mealName = editMealText.getText().toString().trim();
+                String calorieText = editCalorieText.getText().toString().trim();
+                String date = editDateText.getText().toString().trim();
 
                 if (mealName.isEmpty()) {
                     Toast.makeText(InputMealView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
@@ -89,6 +100,10 @@ public class InputMealView extends AppCompatActivity implements
                 } else if (date.length() != 10) {
                     Toast.makeText(InputMealView.this, "Date is in invalid format", Toast.LENGTH_SHORT).show();
                     return;
+                } else if (mealName == null || calorieText == null || date == null) {
+                    mealName = "Nothing";
+                    calorieText = "0";
+                    date = "00/00/0000";
                 }
 
                 // Get the current user's username

@@ -61,6 +61,10 @@ public class PersonalInfoView extends AppCompatActivity implements
                 // Validate inputs
                 if (height.isEmpty() || weight.isEmpty() || gender.isEmpty()) {
                     Toast.makeText(PersonalInfoView.this, "Please fill out all the fields", Toast.LENGTH_SHORT).show();
+                } else if (gender == null || height == null || weight == null) {
+                    gender = "Unknown";
+                    height = "0";
+                    weight = "0";
                 } else {
                     // Retrieve the username (email) from the User singleton instance
                     String username = user.getUsername();
