@@ -9,6 +9,7 @@ public class User {
     private String username;
     private String password;
 
+
     private String height;
     private String weight;
     private String gender;
@@ -20,6 +21,7 @@ public class User {
         this.height = "";
         this.weight = "";
         this.gender = "";
+
     }
 
     public String getUsername() {

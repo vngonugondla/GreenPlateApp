@@ -62,11 +62,7 @@ public class LoginViewModel extends BaseObservable {
         String username = getUserUsername();
         String password = getUserPassword();
 
-        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-            return false;
-        }
-
-        if (TextUtils.isEmpty(username.trim()) || TextUtils.isEmpty(password.trim())) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             return false;
         }
 

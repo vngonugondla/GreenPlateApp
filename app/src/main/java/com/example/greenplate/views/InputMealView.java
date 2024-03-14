@@ -131,6 +131,20 @@ public class InputMealView extends AppCompatActivity implements
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Toast.makeText(InputMealView.this, "Meal added to user profile", Toast.LENGTH_SHORT).show();
+
+                    
+               /* } else {
+                    try {
+                        int calorieValue = Integer.parseInt(calorieText);
+                        DatabaseReference newMealRef = root.push();
+                        newMealRef.child("Meal Name").setValue(mealName);
+                        newMealRef.child("Date").setValue(date);
+                        newMealRef.child("Calories").setValue(calorieValue)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(InputMealView.this, "Meal saved!", Toast.LENGTH_SHORT).show();*/
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -157,26 +171,7 @@ public class InputMealView extends AppCompatActivity implements
         });
 
     }
-        public boolean onNavigationItemSelected (@NonNull MenuItem item){
-            int id = item.getItemId();
-            if (id == R.id.Home) {
-                startActivity(new Intent(InputMealView.this, Home.class));
-                return true;
-            } else if (id == R.id.Recipe) {
-                startActivity(new Intent(InputMealView.this, RecipeView.class));
-                return true;
-            } else if (id == R.id.Ingredients) {
-                startActivity(new Intent(InputMealView.this, IngredientsView.class));
-                return true;
-            } else if (id == R.id.ShoppingList) {
-                startActivity(new Intent(InputMealView.this, ShoppingListView.class));
-                return true;
-            } else if (id == R.id.InputMeal) {
-                //startActivity(new Intent(InputMealView.this, ShoppingListView.class));
-                return true;
-            }
-            return false;
-        }
+       
     private void retrieveUserInfoAndCalculateCalorieGoal() {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -265,3 +260,26 @@ public class InputMealView extends AppCompatActivity implements
 
 
 }
+
+
+    // will need to be updated once personal info screen gets created
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.Home) {
+            startActivity(new Intent(InputMealView.this, Home.class));
+            return true;
+        } else if (id == R.id.Recipe) {
+            startActivity(new Intent(InputMealView.this, RecipeView.class));
+            return true;
+        } else if (id == R.id.InputMeal) {
+            return true; //ensures we can navigate to input meal screen from input meal screen
+        } else if (id == R.id.Ingredients) {
+            startActivity(new Intent(InputMealView.this, IngredientsView.class));
+            return true;
+        } else if (id == R.id.ShoppingList) {
+            startActivity(new Intent(InputMealView.this, ShoppingListView.class));
+            return true;
+        }
+    }
+
