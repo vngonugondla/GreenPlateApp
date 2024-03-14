@@ -7,10 +7,11 @@ import com.example.greenplate.model.User;
 
 public class AccountCreationViewModel extends ViewModel {
 
-    private User user;
+    private User user = User.getInstance() ;
 
     public AccountCreationViewModel() {
-        user = new User("", "");
+        user.setUsername("");
+        user.setPassword("");
     }
 
 
