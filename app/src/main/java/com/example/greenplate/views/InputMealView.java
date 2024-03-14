@@ -32,7 +32,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class InputMealView extends AppCompatActivity implements
-        BottomNavigationView.OnNavigationItemSelectedListener{
+        BottomNavigationView.OnNavigationItemSelectedListener {
     private EditText editMealText;
     private EditText editCalorieText;
     private Button enterMealButton;
@@ -108,7 +108,7 @@ public class InputMealView extends AppCompatActivity implements
 
                 // Get the current user's username
                 String username = User.getInstance().getUsername();
-                if(username == null || username.isEmpty()) {
+                if (username == null || username.isEmpty()) {
                     Toast.makeText(InputMealView.this, "User is not logged in", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -132,19 +132,6 @@ public class InputMealView extends AppCompatActivity implements
                                     public void onSuccess(Void unused) {
                                         Toast.makeText(InputMealView.this, "Meal added to user profile", Toast.LENGTH_SHORT).show();
 
-                    
-               /* } else {
-                    try {
-                        int calorieValue = Integer.parseInt(calorieText);
-                        DatabaseReference newMealRef = root.push();
-                        newMealRef.child("Meal Name").setValue(mealName);
-                        newMealRef.child("Date").setValue(date);
-                        newMealRef.child("Calories").setValue(calorieValue)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(InputMealView.this, "Meal saved!", Toast.LENGTH_SHORT).show();*/
-
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -159,8 +146,6 @@ public class InputMealView extends AppCompatActivity implements
                 }
             }
         });
-//        retrieveUserInfoAndCalculateCalorieGoal();
-//        calculateAndDisplayDailyCalorieIntake();
         Button showInfoButton = findViewById(R.id.showInfoButton);
         showInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,7 +156,7 @@ public class InputMealView extends AppCompatActivity implements
         });
 
     }
-       
+
     private void retrieveUserInfoAndCalculateCalorieGoal() {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -259,9 +244,6 @@ public class InputMealView extends AppCompatActivity implements
     }
 
 
-}
-
-
     // will need to be updated once personal info screen gets created
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -281,5 +263,7 @@ public class InputMealView extends AppCompatActivity implements
             startActivity(new Intent(InputMealView.this, ShoppingListView.class));
             return true;
         }
+        return false;
     }
+}
 
