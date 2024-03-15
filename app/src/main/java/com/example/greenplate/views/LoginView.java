@@ -78,23 +78,23 @@ public class LoginView extends AppCompatActivity {
         }
     }
 
-//    private void signIn(String email, String password) {
-//        mAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//                            // Sign in success, show successful login message
-//                            Toast.makeText(LoginView.this, "Account successfully created.",
-//                                    Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            Toast.makeText(LoginView.this, "Login failed.",
-//                                    Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//    }
+    //    private void signIn(String email, String password) {
+    //        mAuth.signInWithEmailAndPassword(email, password)
+    //                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+    //                    @Override
+    //                    public void onComplete(@NonNull Task<AuthResult> task) {
+    //                        if (task.isSuccessful()) {
+    //                            // Sign in success, show successful login message
+    //                            Toast.makeText(LoginView.this, "Account successfully created.",
+    //                                    Toast.LENGTH_SHORT).show();
+    //                        } else {
+    //                            // If sign in fails, display a message to the user.
+    //                            Toast.makeText(LoginView.this, "Login failed.",
+    //                                    Toast.LENGTH_SHORT).show();
+    //                        }
+    //                    }
+    //                });
+    //    }
 
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
@@ -105,7 +105,8 @@ public class LoginView extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             if (firebaseUser != null) {
-                                // Here we are using the email as the username. If you have a different username, you should adjust accordingly.
+                                // Here we are using the email as the username.
+                                // If you have a different username, you should adjust accordingly.
                                 String username = firebaseUser.getEmail();
                                 User.getInstance().setUsername(username);
 
@@ -118,7 +119,8 @@ public class LoginView extends AppCompatActivity {
                             }
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(LoginView.this, "Login failed: " + task.getException().getMessage(),
+                            Toast.makeText(LoginView.this, "Login failed: "
+                                            + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

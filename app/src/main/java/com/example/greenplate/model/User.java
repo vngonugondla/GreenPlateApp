@@ -1,10 +1,5 @@
 package com.example.greenplate.model;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 public class User {
     private String username;
     private String password;
@@ -13,7 +8,7 @@ public class User {
     private String height;
     private String weight;
     private String gender;
-    public static User singleton;
+    private static User singleton;
 
     private User(String username, String password, String height, String weight, String gender) {
         this.username = "";
@@ -21,7 +16,6 @@ public class User {
         this.height = "";
         this.weight = "";
         this.gender = "";
-
     }
 
     public String getUsername() {
@@ -48,7 +42,8 @@ public class User {
         return weight;
     }
 
-    public String getGender() { return gender; }
+    public String getGender() {
+        return gender; }
 
     public void setHeight(String height) {
         this.height = height;
@@ -65,7 +60,7 @@ public class User {
         if (singleton == null) {
             synchronized (User.class) {
                 if (singleton == null) {
-                    singleton = new User("","","","","");
+                    singleton = new User("", "", "", "", "");
                 }
             }
         }

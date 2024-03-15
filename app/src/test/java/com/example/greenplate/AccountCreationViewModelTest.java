@@ -19,18 +19,31 @@ public class AccountCreationViewModelTest {
 
     @Test
     public void whenGivenValidInput_thenAccountShouldBeValid() {
-        viewModel.setUser(new User("validUsername", "validPass"));
+        viewModel.setUser(User.getInstance());
+        String userName = "validUsername";
+        String password = "validPass";
+        User.getInstance().setUsername(userName);
+        User.getInstance().setPassword(password);
         assertTrue(viewModel.isValidInput());
     }
 
+
     @Test
     public void whenPasswordIsShort_thenAccountShouldBeInvalid() {
-        viewModel.setUser(new User("username", "123"));
+        viewModel.setUser(User.getInstance());
+        String userName = "username";
+        String password = "123";
+        User.getInstance().setUsername(userName);
+        User.getInstance().setPassword(password);
         assertFalse(viewModel.isValidInput());
     }
     @Test
     public void whenPasswordIsExactlyFiveCharacters_thenShouldBeConsideredValid() {
-        viewModel.setUser(new User("user", "12345"));
+        viewModel.setUser(User.getInstance());
+        String userName = "username";
+        String password = "12345";
+        User.getInstance().setUsername(userName);
+        User.getInstance().setPassword(password);
         assertTrue("Password with exactly 5 characters should be considered valid.", viewModel.isValidInput());
     }
 }

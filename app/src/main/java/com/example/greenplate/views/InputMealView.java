@@ -1,11 +1,15 @@
 package com.example.greenplate.views;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,21 +20,17 @@ import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
 import com.example.greenplate.R;
+import com.example.greenplate.model.MealInfo;
 import com.example.greenplate.model.User;
+import com.example.greenplate.viewmodels.InputMealViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.greenplate.viewmodels.InputMealViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
-import android.content.Intent;
-import android.view.MenuItem;
-import com.example.greenplate.model.MealInfo;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -100,16 +100,20 @@ public class InputMealView extends AppCompatActivity implements
                 String date = editDateText.getText().toString().trim();
 
                 if (mealName.isEmpty()) {
-                    Toast.makeText(InputMealView.this, "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "Meal Name cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 } else if (calorieText.isEmpty()) {
-                    Toast.makeText(InputMealView.this, "Calories field cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "Calories field cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 } else if (date.isEmpty()) {
-                    Toast.makeText(InputMealView.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "Date cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 } else if (date.length() != 10) {
-                    Toast.makeText(InputMealView.this, "Date is in invalid format", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "Date is in invalid format", Toast.LENGTH_SHORT).show();
                     return;
                 } else if (mealName == null || calorieText == null || date == null) {
                     mealName = "Nothing";
@@ -120,19 +124,29 @@ public class InputMealView extends AppCompatActivity implements
                 // Get the current user's username
                 String username = User.getInstance().getUsername();
                 if (username == null || username.isEmpty()) {
-                    Toast.makeText(InputMealView.this, "User is not logged in", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "User is not logged in", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // Sanitize the username to create a valid Firebase key
                 String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
                 setupViz1Button(sanitizedUsername);
+                Button viz2Button = findViewById(R.id.button2);
+                viz2Button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fetchAndCompareData(sanitizedUsername);
+                    }
+                });
                 // Locate the user's entry in the "Users" table and add the meal information
-                DatabaseReference userMealsRef = FirebaseDatabase.getInstance().getReference("Users").child(sanitizedUsername).child("Meals");
+                DatabaseReference userMealsRef = FirebaseDatabase.getInstance()
+                        .getReference("Users").child(sanitizedUsername).child("Meals");
 
                 try {
                     int calorieValue = Integer.parseInt(calorieText);
-                    MealInfo mealInfo = new MealInfo(mealName, calorieValue, date); // Assuming you have a MealInfo class that represents the structure of a meal
+                    // Assuming you have a MealInfo class that represents the structure of a meal
+                    MealInfo mealInfo = new MealInfo(mealName, calorieValue, date);
 
                     // Generate a unique key for the new meal entry
                     String mealKey = userMealsRef.push().getKey();
@@ -141,19 +155,25 @@ public class InputMealView extends AppCompatActivity implements
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Toast.makeText(InputMealView.this, "Meal added to user profile", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(InputMealView.this,
+                                                "Meal added to user profile",
+                                                Toast.LENGTH_SHORT).show();
 
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(InputMealView.this, "Failed to add meal to user profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(InputMealView.this,
+                                                "Failed to add meal to user profile: "
+                                                        + e.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }
                 } catch (NumberFormatException e) {
-                    Toast.makeText(InputMealView.this, "Invalid Calorie Input", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputMealView.this,
+                            "Invalid Calorie Input", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -178,22 +198,28 @@ public class InputMealView extends AppCompatActivity implements
                     String weight = dataSnapshot.child("weight").getValue(String.class);
 
                     if (gender == null || height == null || weight == null) {
-                        Toast.makeText(InputMealView.this, "One or more user information fields are missing.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InputMealView.this,
+                                "One or more user information fields are missing.",
+                                Toast.LENGTH_SHORT).show();
                         return; // Exit if any of the fields are null
                     }
 
-                    userInfoTextView.setText(String.format(Locale.US, "Gender: %s, Height: %s cm, Weight: %s kg", gender, height, weight));
+                    userInfoTextView.setText(String.format(Locale.US,
+                            "Gender: %s, Height: %s cm, Weight: %s kg",
+                            gender, height, weight));
 
                     try {
                         double calorieGoal = calculateCalorieGoal(gender, height, weight);
-                        calorieGoalTextView.setText(String.format(Locale.US, "Calorie Goal: %.2f kcal", calorieGoal));
+                        calorieGoalTextView.setText(String.format(Locale.US,
+                                "Calorie Goal: %.2f kcal", calorieGoal));
                     } catch (IllegalArgumentException e) {
-                        Toast.makeText(InputMealView.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InputMealView.this, e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     // Handle the case where user data is not found
-                    userInfoTextView.setText("User information not available");
-                    calorieGoalTextView.setText("N/A");
+                    userInfoTextView.setText("User Information: unknown");
+                    calorieGoalTextView.setText("Calorie Goal: N/A");
                 }
             }
 
@@ -212,9 +238,11 @@ public class InputMealView extends AppCompatActivity implements
             double weight = Double.parseDouble(weightStr);
 
             if (gender.equalsIgnoreCase("Male")) {
-                bmr = 66 + (13.75 * weight) + (5 * height) - (6.75 * 25); // Example age 25 used for BMR calculation
+                // Example age 25 used for BMR calculation
+                bmr = 66 + (13.75 * weight) + (5 * height) - (6.75 * 25);
             } else if (gender.equalsIgnoreCase("Female")) {
-                bmr = 655 + (9.56 * weight) + (1.85 * height) - (4.7 * 25); // Example age 25 used for BMR calculation
+                // Example age 25 used for BMR calculation
+                bmr = 655 + (9.56 * weight) + (1.85 * height) - (4.7 * 25);
             } else {
                 throw new IllegalArgumentException("Invalid gender specified.");
             }
@@ -231,27 +259,30 @@ public class InputMealView extends AppCompatActivity implements
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
         String currentDateStr = dateFormat.format(currentDate);
 
-        mealsRef.orderByChild("date").equalTo(currentDateStr).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int totalCalories = 0;
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot mealSnapshot : dataSnapshot.getChildren()) {
-                        // Make sure to check for null here as well
-                        Integer calories = mealSnapshot.child("calories").getValue(Integer.class);
-                        if (calories != null) {
-                            totalCalories += calories;
+        mealsRef.orderByChild("date").equalTo(currentDateStr)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        int totalCalories = 0;
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot mealSnapshot : dataSnapshot.getChildren()) {
+                                // Make sure to check for null here as well
+                                Integer calories = mealSnapshot.child("calories")
+                                        .getValue(Integer.class);
+                                if (calories != null) {
+                                    totalCalories += calories;
+                                }
+                            }
                         }
-                    }
-                }
-                dailyCalorieIntakeTextView.setText("Daily Calorie Intake: " + totalCalories + " kcal");
-            }
+                        dailyCalorieIntakeTextView
+                                .setText("Daily Calorie Intake: " + totalCalories + " kcal");
+                        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("DatabaseError", "Error: " + databaseError.getMessage());
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("DatabaseError", "Error: " + databaseError.getMessage());
+                    }
+                });
     }
 
     private void setupViz1Button(String currentUser) {
@@ -273,7 +304,8 @@ public class InputMealView extends AppCompatActivity implements
             return; // Exit the method if no user is signed in
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(currentUser).child("Meals");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users")
+                .child(currentUser).child("Meals");
 
         Calendar calendar = Calendar.getInstance();
         // Adjust the date format here
@@ -284,41 +316,46 @@ public class InputMealView extends AppCompatActivity implements
 
         Log.d("ChartDebug", "Querying database from " + startDate + " to " + endDate);
 
-        ref.orderByChild("date").startAt(startDate).endAt(endDate).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                TreeMap<String, Integer> dailyCaloricIntakeMap = new TreeMap<>();
-                for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
-                    MealInfo meal = mealSnapshot.getValue(MealInfo.class);
-                    if (meal != null && meal.getDate() != null) {
-                        int calories = meal.getCalories();
-                        dailyCaloricIntakeMap.put(meal.getDate(),
-                                dailyCaloricIntakeMap.getOrDefault(meal.getDate(), 0) + calories);
+        ref.orderByChild("date").startAt(startDate).endAt(endDate)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        TreeMap<String, Integer> dailyCaloricIntakeMap = new TreeMap<>();
+                        for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
+                            MealInfo meal = mealSnapshot.getValue(MealInfo.class);
+                            if (meal != null && meal.getDate() != null) {
+                                int calories = meal.getCalories();
+                                dailyCaloricIntakeMap.put(meal.getDate(),
+                                        dailyCaloricIntakeMap.getOrDefault(meal.getDate(),
+                                                0) + calories);
 
-                        Log.d("ChartDebug", "Found entry: Date=" + meal.getDate() + ", Calories=" + calories);
+                                Log.d("ChartDebug", "Found entry: Date=" + meal.getDate()
+                                        + ", Calories=" + calories);
+                            }
+                        }
+
+                        if (dailyCaloricIntakeMap.isEmpty()) {
+                            Log.d("ChartDebug", "No data found for the specified period.");
+                        }
+
+                        List<Integer> dailyCaloricIntake =
+                                new ArrayList<>(dailyCaloricIntakeMap.values());
+                        List<String> dateLabels = new ArrayList<>(dailyCaloricIntakeMap.keySet());
+                        createCaloricIntakeChart(dateLabels, dailyCaloricIntake);
                     }
-                }
 
-                if (dailyCaloricIntakeMap.isEmpty()) {
-                    Log.d("ChartDebug", "No data found for the specified period.");
-                }
-
-                List<Integer> dailyCaloricIntake = new ArrayList<>(dailyCaloricIntakeMap.values());
-                List<String> dateLabels = new ArrayList<>(dailyCaloricIntakeMap.keySet());
-                createCaloricIntakeChart(dateLabels, dailyCaloricIntake);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("DBError", "Database query cancelled", error.toException());
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.w("DBError", "Database query cancelled", error.toException());
+                    }
+                });
     }
 
 
 
 
-    private void createCaloricIntakeChart(List<String> dateLabels, List<Integer> dailyCaloricIntake) {
+    private void createCaloricIntakeChart(List<String> dateLabels,
+                                          List<Integer> dailyCaloricIntake) {
         Cartesian columnChart = AnyChart.column();
         List<DataEntry> data = new ArrayList<>();
         for (int i = 0; i < dailyCaloricIntake.size(); i++) {
@@ -335,6 +372,59 @@ public class InputMealView extends AppCompatActivity implements
         anyChartView.setChart(columnChart);
     }
 
+    private void fetchAndCompareData(String currentUser) {
+        if (currentUser == null) {
+            Toast.makeText(this, "No user is currently signed in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        String todayDate = sdf.format(new Date());
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users")
+                .child(currentUser).child("Meals");
+        ref.orderByChild("date").equalTo(todayDate)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        int totalCalories = 0;
+                        for (DataSnapshot mealSnapshot : snapshot.getChildren()) {
+                            Integer calories = mealSnapshot.child("calories")
+                                    .getValue(Integer.class);
+                            if (calories != null) {
+                                totalCalories += calories;
+                            }
+                        }
+
+                        // Assuming user's gender, height, and weight are stored and accessible
+                        // Replace "male", "170", and "70" with actual user data
+                        double calorieGoal = calculateCalorieGoal("male",
+                                "170", "70");
+
+                        List<DataEntry> data = new ArrayList<>();
+                        data.add(new ValueDataEntry("Calorie Goal", calorieGoal));
+                        data.add(new ValueDataEntry("Caloric Intake", totalCalories));
+                        displayComparisonChart(data);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("DBError", "Database query cancelled", error.toException());
+                    }
+                });
+    }
+
+    // Method to display the comparison chart
+    private void displayComparisonChart(List<DataEntry> data) {
+        Cartesian barChart = AnyChart.bar();
+        barChart.data(data);
+
+        barChart.title("Daily Caloric Intake vs Goal");
+        barChart.yAxis(0).title("Calories");
+
+        AnyChartView anyChartView = findViewById(R.id.any_chart_view);
+        anyChartView.setChart(barChart);
+    }
 
 
 

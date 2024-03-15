@@ -1,13 +1,11 @@
 package com.example.greenplate.viewmodels;
 
-import android.text.TextUtils;
-
 import androidx.lifecycle.ViewModel;
 import com.example.greenplate.model.User;
 
 public class AccountCreationViewModel extends ViewModel {
 
-    private User user = User.getInstance() ;
+    private User user = User.getInstance();
 
     public AccountCreationViewModel() {
         user.setUsername("");
@@ -25,12 +23,12 @@ public class AccountCreationViewModel extends ViewModel {
     }
 
     public boolean isValidInput() {
-        //return !user.getUsername().isEmpty() && user.getUsername() != null && !user.getPassword().isEmpty() && user.getPassword() != null;
 
         String username = user.getUsername();
         String password = user.getPassword();
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty() || password == null
+                || password.trim().isEmpty()) {
             return false;
         }
 
