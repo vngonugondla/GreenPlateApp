@@ -1,12 +1,17 @@
 package com.example.greenplate.views;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.example.greenplate.R;
 import com.example.greenplate.model.PersonalInfoModel;
 import com.example.greenplate.model.User;
@@ -14,18 +19,11 @@ import com.example.greenplate.viewmodels.PersonalInfoViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.greenplate.viewmodels.InputMealViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
-import android.content.Intent;
-import android.view.MenuItem;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class PersonalInfoView extends AppCompatActivity implements
-        BottomNavigationView.OnNavigationItemSelectedListener{
+        BottomNavigationView.OnNavigationItemSelectedListener {
     private EditText editHeight;
     private EditText editWeight;
     private EditText editGender;
@@ -60,7 +58,8 @@ public class PersonalInfoView extends AppCompatActivity implements
 
                 // Validate inputs
                 if (height.isEmpty() || weight.isEmpty() || gender.isEmpty()) {
-                    Toast.makeText(PersonalInfoView.this, "Please fill out all the fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PersonalInfoView.this,
+                            "Please fill out all the fields", Toast.LENGTH_SHORT).show();
                 } else if (gender == null || height == null || weight == null) {
                     gender = "Unknown";
                     height = "0";
@@ -71,19 +70,26 @@ public class PersonalInfoView extends AppCompatActivity implements
                     if (username != null && !username.isEmpty()) {
                         // Use only the part before the '@' symbol in the email as the key
                         // and remove any periods or other illegal characters
-                        String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+                        String sanitizedUsername = username.split("@")[0]
+                                .replaceAll("[.#$\\[\\]]", "");
 
                         // Use the sanitized username to create a reference in your database
                         DatabaseReference userRef = root.child(sanitizedUsername);
 
-                        PersonalInfoModel personalInfo = new PersonalInfoModel(height, weight, gender);
+                        PersonalInfoModel personalInfo = new PersonalInfoModel(height,
+                                weight, gender);
                         userRef.setValue(personalInfo)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Toast.makeText(PersonalInfoView.this, "Information saved successfully", Toast.LENGTH_SHORT).show();
-                                        // Inside PersonalInfoView.java, inside the onSuccessListener of saving data
-                                        Intent intent = new Intent(PersonalInfoView.this, InputMealView.class);
+                                        Toast.makeText(PersonalInfoView.this,
+                                                "Information saved successfully",
+                                                Toast.LENGTH_SHORT).show();
+                                        // Inside PersonalInfoView.java, inside
+                                        // the onSuccessListener of saving data
+                                        Intent intent = new Intent(
+                                                PersonalInfoView.this,
+                                                InputMealView.class);
                                         startActivity(intent);
 
                                     }
@@ -91,18 +97,22 @@ public class PersonalInfoView extends AppCompatActivity implements
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(PersonalInfoView.this, "Failed to save information: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(PersonalInfoView.this,
+                                                "Failed to save information: "
+                                                        + e.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {
-                        Toast.makeText(PersonalInfoView.this, "Username not set", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PersonalInfoView.this,
+                                "Username not set", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
 
     }
-    public boolean onNavigationItemSelected (@NonNull MenuItem item){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.Home) {
             startActivity(new Intent(PersonalInfoView.this, Home.class));

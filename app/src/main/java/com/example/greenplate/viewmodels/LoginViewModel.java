@@ -2,8 +2,7 @@ package com.example.greenplate.viewmodels;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import android.util.Patterns;
-import android.text.TextUtils;
+
 import com.example.greenplate.BR;
 import com.example.greenplate.model.User;
 
@@ -62,7 +61,8 @@ public class LoginViewModel extends BaseObservable {
         String username = getUserUsername();
         String password = getUserPassword();
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty() || password == null
+                || password.trim().isEmpty()) {
             return false;
         }
 

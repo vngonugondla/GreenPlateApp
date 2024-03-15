@@ -1,9 +1,10 @@
 package com.example.greenplate.viewmodels;
+
 import android.text.TextUtils;
+
 import androidx.lifecycle.ViewModel;
-import com.example.greenplate.model.InputMealModel;
+
 import com.example.greenplate.model.User;
-import com.example.greenplate.model.PersonalInfoModel;
 
 public class PersonalInfoViewModel extends ViewModel {
     private User userInfo;
@@ -34,10 +35,10 @@ public class PersonalInfoViewModel extends ViewModel {
         }
     }
     public boolean isValidInput(User userInfo) {
-        return userInfo != null &&
-                !TextUtils.isEmpty(userInfo.getGender()) &&
-                !TextUtils.isEmpty(userInfo.getHeight()) &&
-                !TextUtils.isEmpty(userInfo.getWeight());
+        return userInfo != null
+                && !TextUtils.isEmpty(userInfo.getGender())
+                && !TextUtils.isEmpty(userInfo.getHeight())
+                && !TextUtils.isEmpty(userInfo.getWeight());
     }
 
 

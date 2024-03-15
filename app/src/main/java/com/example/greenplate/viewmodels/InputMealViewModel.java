@@ -1,6 +1,7 @@
 package com.example.greenplate.viewmodels;
-import android.text.TextUtils;
+
 import androidx.lifecycle.ViewModel;
+
 import com.example.greenplate.model.InputMealModel;
 
 
@@ -8,7 +9,7 @@ public class InputMealViewModel extends ViewModel {
     private InputMealModel meal;
 
     public InputMealViewModel() {
-        meal = new InputMealModel("",0);
+        meal = new InputMealModel("", 0);
     }
 
     public void setMealName(String name) {
@@ -26,10 +27,10 @@ public class InputMealViewModel extends ViewModel {
         }
     }
     public boolean isValidInput(InputMealModel newMeal) {
-       if (newMeal == null || newMeal.getMealName() == null || newMeal.getMealName().isEmpty()) {
-           return false;
-       }
-       return true;
+        if (newMeal == null || newMeal.getMealName() == null || newMeal.getMealName().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
 }
