@@ -33,6 +33,7 @@ public class RecipeView extends AppCompatActivity
 
     private EditText ingredientNameEditText;
     private EditText quantityEditText;
+    private EditText recipeNameEditText;
     private Button addIngredientButton;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -57,6 +58,7 @@ public class RecipeView extends AppCompatActivity
 
         viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
 
+        recipeNameEditText = findViewById(R.id.recipeNameEditText);
         ingredientNameEditText = findViewById(R.id.ingredientNameEditText);
         quantityEditText = findViewById(R.id.ingredientQuantityEditText);
         addIngredientButton = findViewById(R.id.addIngredientButton);
@@ -64,25 +66,50 @@ public class RecipeView extends AppCompatActivity
         addIngredientButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String recipeName = recipeNameEditText.getText().toString();
                 String ingredientName = ingredientNameEditText.getText().toString();
-                String quantity = quantityEditText.getText().toString();
+                String quantity = quantityEditText.getText().toString().trim(); // Trim any leading or trailing spaces
 
-                if (ingredientName.isEmpty() || quantity.isEmpty()) {
+                if (recipeName.isEmpty() || ingredientName.isEmpty() || quantity.isEmpty()) {
                     Toast.makeText(RecipeView.this,
-                            "Please enter both ingredient name and quantity",
-                            Toast.LENGTH_SHORT).show();
-                } else if (Double.parseDouble(quantity) <= 0) {
-                    Toast.makeText(RecipeView.this,
-                            "Quantity must be positive",
+                            "Please enter both recipe name, ingredient name, and quantity",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    addRecipe(ingredientName, quantity);
+                    // Split the quantity string by commas and concatenate the resulting substrings
+                    String[] quantityParts = quantity.split(",");
+                    //StringBuilder quantityBuilder = new StringBuilder();
+                    //for (String part : quantityParts) {
+                    //    quantityBuilder.append(part.trim()); // Trim any leading or trailing spaces in each part
+                    //}
+                    //quantity = quantityBuilder.toString();
+
+                    // Check if the quantity is a valid number
+                    try {
+                        //double quantityValue = Double.parseDouble(quantity);
+                        for (String part: quantityParts) {
+                            double quantityValue = Double.parseDouble(part);
+                            if (quantityValue <= 0) {
+                                Toast.makeText(RecipeView.this,
+                                        "Quantity must be positive",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(RecipeView.this,
+                                "Invalid quantity format",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    addRecipe(recipeName, ingredientName, quantity);
                 }
             }
         });
     }
 
-    private void addRecipe(String ingredientName, String quantity) {
+    private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
         // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
@@ -93,69 +120,73 @@ public class RecipeView extends AppCompatActivity
             // Use the sanitized username to create a reference in your database
             DatabaseReference userRef = root.child(sanitizedUsername);
 
-            // Check if the ingredient already exists for the user
-            userRef.child(ingredientName).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        // If the ingredient already exists, add the provided quantity to the existing quantity
-                        String existingQuantity = dataSnapshot.getValue(String.class);
-                        double newQuantity = Double.parseDouble(existingQuantity) + Double.parseDouble(quantity);
-                        userRef.child(ingredientName).setValue(String.valueOf(newQuantity))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(RecipeView.this,
-                                                "Recipe updated in cookbook.",
-                                                Toast.LENGTH_SHORT).show();
-                                        // Navigate to the desired activity after successful update
-                                        Intent intent = new Intent(RecipeView.this, InputMealView.class);
-                                        startActivity(intent);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(RecipeView.this,
-                                                "Failed to update recipe: " + e.getMessage(),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    } else {
-                        userRef.child(ingredientName).setValue(quantity)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(RecipeView.this,
-                                                "Recipe added to cookbook.",
-                                                Toast.LENGTH_SHORT).show();
-                                        // Navigate to the desired activity after successful addition
-                                        Intent intent = new Intent(RecipeView.this, InputMealView.class);
-                                        startActivity(intent);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(RecipeView.this,
-                                                "Failed to add recipe: " + e.getMessage(),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+            // Create a map to store ingredients and their quantities
+            Map<String, String> recipeIngredients = new HashMap<>();
+
+            // Split the ingredientNameList string by commas to get individual ingredients
+            String[] ingredients = ingredientNameList.split(",");
+            // Split the quantityList string by commas to get individual quantities
+            String[] quantities = quantityList.split(",");
+
+            // Check if the number of ingredients matches the number of quantities
+            if (ingredients.length != quantities.length) {
+                Toast.makeText(RecipeView.this,
+                        "Number of ingredients must match number of quantities",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Loop through each ingredient and quantity pair
+            for (int i = 0; i < ingredients.length; i++) {
+                String ingredientName = ingredients[i].trim();
+                String quantity = quantities[i].trim();
+
+                // Check if the quantity is a valid number
+                try {
+                    double quantityValue = Double.parseDouble(quantity);
+                    if (quantityValue <= 0) {
+                        Toast.makeText(RecipeView.this,
+                                "Quantity for " + ingredientName + " must be positive",
+                                Toast.LENGTH_SHORT).show();
+                        return;
                     }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                } catch (NumberFormatException e) {
                     Toast.makeText(RecipeView.this,
-                            "Database error: " + databaseError.getMessage(),
+                            "Invalid quantity format for " + ingredientName,
                             Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            });
+
+                // Add the ingredient with its quantity to the recipeIngredients map
+                recipeIngredients.put(ingredientName, quantity);
+            }
+
+            // Add the recipe name and its ingredients to the user's reference
+            userRef.child(recipeName).setValue(recipeIngredients)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Toast.makeText(RecipeView.this,
+                                    "Recipe added to cookbook.",
+                                    Toast.LENGTH_SHORT).show();
+
+                            // Navigate to the desired activity after successful addition
+                            Intent intent = new Intent(RecipeView.this, InputMealView.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(RecipeView.this,
+                                    "Failed to add recipe: " + e.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
         } else {
             Toast.makeText(RecipeView.this,
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
-
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

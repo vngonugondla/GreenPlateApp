@@ -20,15 +20,28 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/ingredientNameEditText"
+        android:id="@+id/recipeNameEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="Ingredient Name"
+        android:hint="Recipe Name"
         app:layout_constraintTop_toBottomOf="@id/personalInfoButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <EditText
+        android:id="@+id/ingredientNameEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Ingredient Name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/personalInfoButton" />
 
     <EditText
         android:id="@+id/ingredientQuantityEditText"
@@ -46,7 +59,7 @@
         android:id="@+id/addIngredientButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="Add Ingredient"
         app:layout_constraintStart_toStartOf="@id/ingredientQuantityEditText"
         app:layout_constraintTop_toBottomOf="@id/ingredientQuantityEditText" />
