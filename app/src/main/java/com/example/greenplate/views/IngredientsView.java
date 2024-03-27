@@ -70,7 +70,7 @@ public class IngredientsView extends AppCompatActivity implements
                 String expirationDate = expirationDateEditText.getText().toString();
 
                 // Navigate to the personal information screen
-                startActivity(new Intent(IngredientsView.this, PersonalInfoView.class));
+                startActivity(new Intent(IngredientsView.this, IngredientsView.class));
 
                 if (viewModel.checkIngredientExists(ingredientName)) {
                     Toast.makeText(IngredientsView.this,
