@@ -4,13 +4,15 @@ import java.util.Map;
 public class RecipeModel {
     private String recipeName;
     private Map<String, String> ingredients;
+    private boolean hasEnoughIngredients;
 
     public RecipeModel() {
 
     }
-    public RecipeModel(String recipeName, Map<String, String> ingredients) {
+    public RecipeModel(String recipeName, Map<String, String> ingredients, Boolean hasEnoughIngredients) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
+        this.hasEnoughIngredients = hasEnoughIngredients;
     }
     public String getRecipeName() {
         return recipeName;
@@ -26,5 +28,12 @@ public class RecipeModel {
 
     public void setIngredients(Map<String, String> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public boolean getHasEnoughIngredients() {
+        return hasEnoughIngredients;
+    }
+    public void setHasEnoughIngredients(boolean hasEnoughIngredients) {
+        this.hasEnoughIngredients = hasEnoughIngredients;
     }
 }

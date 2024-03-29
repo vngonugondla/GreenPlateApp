@@ -44,17 +44,21 @@ public class RecipeView extends AppCompatActivity
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference root = db.getReference().child("Cookbook");
     private RecipeViewModel viewModel;
+
+    private IngredientsViewModel ingredientsViewModel;
     private RecipeModel model;
     private User user = User.getInstance();
     private RecyclerView recyclerView;
     private RecipeScrollAdapter adapter;
     private ArrayList<RecipeModel> list;
+    private boolean enough = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
+        ingredientsViewModel = new ViewModelProvider(this).get(IngredientsViewModel.class);
         recyclerView = findViewById(R.id.recipeScrollList);
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
         list = new ArrayList<>();
@@ -70,8 +74,9 @@ public class RecipeView extends AppCompatActivity
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     String recipeName = dataSnapshot.getKey();
                     Map<String,String> ingredients = (Map<String,String>) dataSnapshot.getValue();
-                    list.add(new RecipeModel(recipeName, ingredients));
+                    list.add(new RecipeModel(recipeName, ingredients,false));
                 }
+                checkIngredientSufficiency();
                 adapter.notifyDataSetChanged();
             }
             @Override
@@ -89,7 +94,6 @@ public class RecipeView extends AppCompatActivity
                 startActivity(new Intent(RecipeView.this, PersonalInfoView.class));
             }
         });
-        //viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
         ingredientNameEditText = findViewById(R.id.ingredientNameEditText);
         quantityEditText = findViewById(R.id.ingredientQuantityEditText);
@@ -123,12 +127,73 @@ public class RecipeView extends AppCompatActivity
                     return;
                 }
 
-                addRecipe(recipeName, ingredientName, quantity);
+                addRecipe(recipeName, ingredientName, quantity, enough);
             }
         });
     }
+    private void checkIngredientSufficiency() {
+        String username = user.getUsername();
+        if (username == null || username.isEmpty()) {
+            Toast.makeText(RecipeView.this, "Username is not set. Please log in.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-    private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
+        DatabaseReference pantryRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(username.split("@")[0].replaceAll("[.#$\\[\\]]", ""));
+        pantryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot pantrySnapshot) {
+                if (!pantrySnapshot.exists()) {
+                    Toast.makeText(RecipeView.this, "Pantry data not found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for (RecipeModel recipe : list) {
+                    boolean hasEnough = true;
+                    Map<String, String> ingredients = recipe.getIngredients();
+
+                    if (ingredients == null) {
+                        hasEnough = false;
+                    } else {
+                        for (Map.Entry<String, String> entry : ingredients.entrySet()) {
+                            String ingredient = entry.getKey();
+                            String requiredQuantityStr = entry.getValue();
+                            try {
+                                int requiredQuantity = Integer.parseInt(requiredQuantityStr);
+                                DataSnapshot pantryIngredientSnapshot = pantrySnapshot.child(ingredient);
+
+                                if (!pantryIngredientSnapshot.exists()) {
+                                    hasEnough = false;
+                                    break;
+                                }
+                                String pantryQuantityStr = pantryIngredientSnapshot.child("quantity").getValue(String.class);
+                                if (pantryQuantityStr == null) {
+                                    hasEnough = false;
+                                    break;
+                                }
+                                int pantryQuantity = Integer.parseInt(pantryQuantityStr);
+                                if (pantryQuantity < requiredQuantity) {
+                                    hasEnough = false;
+                                    break;
+                                }
+                            } catch (NumberFormatException e) {
+                                hasEnough = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    recipe.setHasEnoughIngredients(hasEnough);
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(RecipeView.this, "Failed to fetch pantry data.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void addRecipe(String recipeName, String ingredientNameList, String quantityList, Boolean enough) {
         // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
@@ -158,6 +223,7 @@ public class RecipeView extends AppCompatActivity
             // Loop through each ingredient and quantity pair
             for (int i = 0; i < ingredients.length; i++) {
                 String ingredientName = ingredients[i].trim();
+                enough  = ingredientsViewModel.checkIngredientExists(ingredientName);
                 String quantity = quantities[i].trim();
 
                 // Check if the quantity is a valid number
@@ -177,7 +243,6 @@ public class RecipeView extends AppCompatActivity
                 }
 
                 // Add the ingredient with its quantity to the recipeIngredients map
-                //model = new RecipeModel(recipeName, null);
                 recipeIngredients.put(ingredientName, quantity);
             }
 
@@ -189,10 +254,6 @@ public class RecipeView extends AppCompatActivity
                             Toast.makeText(RecipeView.this,
                                     "Recipe added to cookbook.",
                                     Toast.LENGTH_SHORT).show();
-
-                            // Navigate to the desired activity after successful addition
-                            //Intent intent = new Intent(RecipeView.this, RecipeView.class);
-                            //startActivity(intent);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

@@ -1,6 +1,7 @@
 package com.example.greenplate.model;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,18 +42,29 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
             ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
         holder.ingredients.setText(ingredientsBuilder.toString());
+        if (recipeModel.getHasEnoughIngredients()) {
+            holder.ingredientCheckmark.setVisibility(View.VISIBLE);
+            holder.ingredientCross.setVisibility(View.GONE);
+            holder.recipeName.setTextColor(Color.GREEN);
+        } else {
+            holder.recipeName.setTextColor(Color.RED);
+            holder.ingredientCross.setVisibility(View.VISIBLE);
+            holder.ingredientCheckmark.setVisibility(View.GONE);
+
+        }
     }
     @Override
     public int getItemCount() {
         return list.size();
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView recipeName, ingredients;
+        private TextView recipeName, ingredients, ingredientCheckmark, ingredientCross;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeName = itemView.findViewById(R.id.textrecipe);
             ingredients = itemView.findViewById(R.id.textingredients);
+            ingredientCheckmark = itemView.findViewById(R.id.ingredientCheckmark);
+            ingredientCross = itemView.findViewById(R.id.ingredientCross);
         }
-
     }
 }
