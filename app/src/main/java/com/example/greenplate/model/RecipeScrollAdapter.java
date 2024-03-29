@@ -1,6 +1,7 @@
 package com.example.greenplate.model;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,12 @@ import java.util.ArrayList;
 
 public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapter.MyViewHolder> {
 
-    Context context;
-    ArrayList<RecipeModel> list;
+    private Context context;
+    private ArrayList<RecipeModel> list;
 
-    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> list) {
+    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> map) {
         this.context = context;
-        this.list = list;
+        this.list = map;
     }
 
     @NonNull
@@ -33,26 +34,23 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         RecipeModel recipeModel = list.get(position);
-        holder.recipe.setText(recipeModel.getRecipeName());
-        // Convert the map of ingredients to a string and set it to textingredients
-        /*
+        holder.recipeName.setText(recipeModel.getRecipeName());
+        Map<String,String> ingredients = recipeModel.getIngredients();
         StringBuilder ingredientsBuilder = new StringBuilder();
-        for (Map.Entry<String, String> entry : recipe.getIngredients().entrySet()) {
+        for (Map.Entry<String, String> entry : ingredients.entrySet()) {
             ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
         holder.ingredients.setText(ingredientsBuilder.toString());
-        */
     }
-
     @Override
     public int getItemCount() {
         return list.size();
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder{
-        TextView recipe, ingredients;
+        private TextView recipeName, ingredients;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            recipe = itemView.findViewById(R.id.textrecipe);
+            recipeName = itemView.findViewById(R.id.textrecipe);
             ingredients = itemView.findViewById(R.id.textingredients);
         }
 

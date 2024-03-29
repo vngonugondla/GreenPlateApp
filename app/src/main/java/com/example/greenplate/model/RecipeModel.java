@@ -1,14 +1,12 @@
 package com.example.greenplate.model;
-import com.google.firebase.database.IgnoreExtraProperties;
-
-
 import java.util.Map;
 
 public class RecipeModel {
     private String recipeName;
     private Map<String, String> ingredients;
+
     public RecipeModel() {
-        // Default constructor required for Firebase
+
     }
     public RecipeModel(String recipeName, Map<String, String> ingredients) {
         this.recipeName = recipeName;

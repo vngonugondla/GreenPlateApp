@@ -44,6 +44,7 @@ public class RecipeView extends AppCompatActivity
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference root = db.getReference().child("Cookbook");
     private RecipeViewModel viewModel;
+    private RecipeModel model;
     private User user = User.getInstance();
     private RecyclerView recyclerView;
     private RecipeScrollAdapter adapter;
@@ -53,19 +54,23 @@ public class RecipeView extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
         recyclerView = findViewById(R.id.recipeScrollList);
-        recyclerView.setHasFixedSize(true);
+        //recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
         list = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecipeScrollAdapter(this,list);
         recyclerView.setAdapter(adapter);
-        root.addValueEventListener(new ValueEventListener() {
+        String userN = user.getUsername().split("@")[0].replaceAll("[.#$\\[\\]]", "");
+        DatabaseReference userRef = root.child(userN);
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-                    RecipeModel recipeMod = dataSnapshot.getValue(RecipeModel.class);
-                    list.add(recipeMod);
+                    String recipeName = dataSnapshot.getKey();
+                    Map<String,String> ingredients = (Map<String,String>) dataSnapshot.getValue();
+                    list.add(new RecipeModel(recipeName, ingredients));
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -84,7 +89,7 @@ public class RecipeView extends AppCompatActivity
                 startActivity(new Intent(RecipeView.this, PersonalInfoView.class));
             }
         });
-        viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
+        //viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
         ingredientNameEditText = findViewById(R.id.ingredientNameEditText);
         quantityEditText = findViewById(R.id.ingredientQuantityEditText);
@@ -172,6 +177,7 @@ public class RecipeView extends AppCompatActivity
                 }
 
                 // Add the ingredient with its quantity to the recipeIngredients map
+                //model = new RecipeModel(recipeName, null);
                 recipeIngredients.put(ingredientName, quantity);
             }
 
@@ -186,7 +192,7 @@ public class RecipeView extends AppCompatActivity
 
                             // Navigate to the desired activity after successful addition
                             //Intent intent = new Intent(RecipeView.this, RecipeView.class);
-                            //rstartActivity(intent);
+                            //startActivity(intent);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
