@@ -1,31 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     tools:context=".views.RecipeView">
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/userList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Input Meal Screen"
-        android:gravity="center"
-        android:textSize="30dp"
-        android:textColor="@color/black"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp"
-        android:background="@android:color/transparent"
-        app:labelVisibilityMode="labeled"
-        app:layout_anchor="@+id/frame_layout"
-        app:layout_anchorGravity="bottom|center"
-        app:menu="@menu/bottom_menu" />
-
-</FrameLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,8 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
+import com.example.greenplate.model.RecipeModel;
+import com.example.greenplate.model.RecipeScrollAdapter;
 import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.IngredientsViewModel;
 import com.example.greenplate.viewmodels.RecipeViewModel;
@@ -25,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,14 +45,38 @@ public class RecipeView extends AppCompatActivity
     private DatabaseReference root = db.getReference().child("Cookbook");
     private RecipeViewModel viewModel;
     private User user = User.getInstance();
+    private RecyclerView recyclerView;
+    private RecipeScrollAdapter adapter;
+    private ArrayList<RecipeModel> list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
+        recyclerView = findViewById(R.id.recipeScrollList);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
+        list = new ArrayList<>();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new RecipeScrollAdapter(this,list);
+        recyclerView.setAdapter(adapter);
+        root.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    RecipeModel recipeMod = dataSnapshot.getValue(RecipeModel.class);
+                    list.add(recipeMod);
+                }
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-
         Button personalInfoButton = findViewById(R.id.personalInfoButton);
         personalInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,56 +84,41 @@ public class RecipeView extends AppCompatActivity
                 startActivity(new Intent(RecipeView.this, PersonalInfoView.class));
             }
         });
-
         viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
-
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
         ingredientNameEditText = findViewById(R.id.ingredientNameEditText);
         quantityEditText = findViewById(R.id.ingredientQuantityEditText);
         addIngredientButton = findViewById(R.id.addIngredientButton);
-
-        addIngredientButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String recipeName = recipeNameEditText.getText().toString();
-                String ingredientName = ingredientNameEditText.getText().toString();
-                String quantity = quantityEditText.getText().toString().trim(); // Trim any leading or trailing spaces
-
-                if (recipeName.isEmpty() || ingredientName.isEmpty() || quantity.isEmpty()) {
-                    Toast.makeText(RecipeView.this,
-                            "Please enter both recipe name, ingredient name, and quantity",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    // Split the quantity string by commas and concatenate the resulting substrings
-                    String[] quantityParts = quantity.split(",");
-                    //StringBuilder quantityBuilder = new StringBuilder();
-                    //for (String part : quantityParts) {
-                    //    quantityBuilder.append(part.trim()); // Trim any leading or trailing spaces in each part
-                    //}
-                    //quantity = quantityBuilder.toString();
-
-                    // Check if the quantity is a valid number
-                    try {
-                        //double quantityValue = Double.parseDouble(quantity);
-                        for (String part: quantityParts) {
-                            double quantityValue = Double.parseDouble(part);
-                            if (quantityValue <= 0) {
-                                Toast.makeText(RecipeView.this,
-                                        "Quantity must be positive",
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+        addIngredientButton.setOnClickListener(v -> {
+            String recipeName = recipeNameEditText.getText().toString();
+            String ingredientName = ingredientNameEditText.getText().toString();
+            String quantity = quantityEditText.getText().toString().trim(); // Trim any leading or trailing spaces
+            if (recipeName.isEmpty() || ingredientName.isEmpty() || quantity.isEmpty()) {
+                Toast.makeText(RecipeView.this,
+                        "Please enter both recipe name, ingredient name, and quantity",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Split the quantity string by commas and concatenate the resulting substrings
+                String[] quantityParts = quantity.split(",");
+                // Check if the quantity is a valid number
+                try {
+                    for (String part: quantityParts) {
+                        double quantityValue = Double.parseDouble(part);
+                        if (quantityValue <= 0) {
+                            Toast.makeText(RecipeView.this,
+                                    "Quantity must be positive",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
                         }
-
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(RecipeView.this,
-                                "Invalid quantity format",
-                                Toast.LENGTH_SHORT).show();
-                        return;
                     }
-
-                    addRecipe(recipeName, ingredientName, quantity);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(RecipeView.this,
+                            "Invalid quantity format",
+                            Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                addRecipe(recipeName, ingredientName, quantity);
             }
         });
     }
@@ -171,8 +185,8 @@ public class RecipeView extends AppCompatActivity
                                     Toast.LENGTH_SHORT).show();
 
                             // Navigate to the desired activity after successful addition
-                            Intent intent = new Intent(RecipeView.this, InputMealView.class);
-                            startActivity(intent);
+                            //Intent intent = new Intent(RecipeView.this, RecipeView.class);
+                            //rstartActivity(intent);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -188,6 +202,7 @@ public class RecipeView extends AppCompatActivity
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -195,6 +210,7 @@ public class RecipeView extends AppCompatActivity
             startActivity(new Intent(RecipeView.this, Home.class));
             return true;
         } else if (id == R.id.Recipe) {
+            startActivity(new Intent(RecipeView.this, RecipeView.class));
             return true;
         } else if (id == R.id.InputMeal) {
             startActivity(new Intent(RecipeView.this, InputMealView.class));
