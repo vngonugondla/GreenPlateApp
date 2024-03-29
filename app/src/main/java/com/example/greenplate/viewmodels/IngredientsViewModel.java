@@ -101,6 +101,7 @@ public class IngredientsViewModel extends ViewModel {
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     // Handle error - might want to call callback with false or specific error handling
+                    // error
                 }
             });
         } else {
