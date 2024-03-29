@@ -72,7 +72,7 @@ public class IngredientsView extends AppCompatActivity implements
                 // Navigate to the personal information screen
                 startActivity(new Intent(IngredientsView.this, PersonalInfoView.class));
 
-                if (viewModel.checkIngredientExists(ingredientName)) {
+                /*if (viewModel.checkIngredientExists(ingredientName)) {
                     Toast.makeText(IngredientsView.this,
                             "Ingredient already exists in pantry.", Toast.LENGTH_SHORT).show();
                 } else if (Double.parseDouble(quantity) <= 0) {
@@ -80,12 +80,24 @@ public class IngredientsView extends AppCompatActivity implements
                             "Quantity must be positive.", Toast.LENGTH_SHORT).show();
                 } else {
                     addIngredientToPantry(ingredientName, quantity, calories, expirationDate);
-                }
+                }*/
+                viewModel.checkIngredientExists(ingredientName, exists -> {
+                    if (exists) {
+                        // This block is executed if the ingredient exists in the pantry
+                        Toast.makeText(IngredientsView.this, "Ingredient already exists in pantry.", Toast.LENGTH_SHORT).show();
+                    } else if (Double.parseDouble(quantity) <= 0) {
+                        // This block is executed if the quantity is less than or equal to 0
+                        Toast.makeText(IngredientsView.this, "Quantity must be positive.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // This block is executed if the ingredient does not exist and the quantity is positive
+                        addIngredientToPantry(ingredientName, quantity, calories, expirationDate);
+                    }
+                });
             }
         });
     }
 
-    private void addIngredientToPantry(String ingredientName, String quantity, String calories, String expirationDate) {
+    public void addIngredientToPantry(String ingredientName, String quantity, String calories, String expirationDate) {
         // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
@@ -129,6 +141,7 @@ public class IngredientsView extends AppCompatActivity implements
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
