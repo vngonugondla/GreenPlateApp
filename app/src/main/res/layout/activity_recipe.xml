@@ -59,24 +59,24 @@
         android:id="@+id/addIngredientButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Add Ingredient"
-        app:layout_constraintStart_toStartOf="@id/ingredientQuantityEditText"
+        android:text="Add Recipe"
+        app:layout_constraintBottom_toTopOf="@+id/recipeScrollList"
+        android:paddingBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ingredientQuantityEditText" />
 
-    <LinearLayout
-        android:id="@+id/ingredientListLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addIngredientButton"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
 
-    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recipeScrollList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/addIngredientButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="70dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
