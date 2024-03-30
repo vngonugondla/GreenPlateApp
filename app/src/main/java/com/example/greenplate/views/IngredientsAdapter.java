@@ -82,8 +82,8 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
                 userRef = pantryRef.child(sanitizedUsername);
                 //DatabaseReference ingredientRef = userRef.child(ingredient.getIngredientName());
             }
-            double currentQuantity = 0;
-            //double currentQuantity = Double.parseDouble(ingredient.getQuantity());
+            //double currentQuantity = 0;
+            double currentQuantity = Double.parseDouble(ingredient.getQuantity());
             double newQuantity = increase ? currentQuantity + 1 : currentQuantity - 1;
 
             if (newQuantity <= 0) {

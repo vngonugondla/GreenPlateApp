@@ -240,8 +240,27 @@ public class IngredientsView extends AppCompatActivity implements
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
                         String ingredientStr = snapshot.getKey();
-                        Long quantityLong = snapshot.child("quantity").getValue(Long.class);
-                        String quantityStr = String.valueOf(quantityLong);
+                        String quantityStr;
+
+                        Object quantityObj = snapshot.child("quantity").getValue();
+                        if (quantityObj instanceof Long) {
+                            quantityStr = String.valueOf(quantityObj);
+                        } else if (quantityObj instanceof String) {
+                            // Here, you can directly use the string or attempt to parse it as a long if necessary
+                            quantityStr = (String) quantityObj;
+                            try {
+                                long quantityLong = Long.parseLong(quantityStr);
+                                // If parsing is successful but you still need it as a string
+                                quantityStr = String.valueOf(quantityLong);
+                            } catch (NumberFormatException e) {
+                                // Handle the case where the string cannot be parsed to a long
+                                quantityStr = "Invalid Format"; // Adjust based on how you want to handle this
+                            }
+                        } else {
+                            // Handle other types or null
+                            quantityStr = "Unknown Quantity"; // Adjust accordingly
+                        }
+
                         //String quantityStr = snapshot.child("quantity").getValue(String.class);
                         //String quantityStr = "999";
                         String caloriesStr = "999";
