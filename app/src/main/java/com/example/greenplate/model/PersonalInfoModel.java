@@ -11,6 +11,7 @@ public class PersonalInfoModel {
         this.gender = gender;
     }
 
+    //getters and setters below
     public String getHeight() {
         return height;
     }
