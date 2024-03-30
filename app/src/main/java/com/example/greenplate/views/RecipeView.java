@@ -28,13 +28,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 public class RecipeView extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener {
+        implements BottomNavigationView.OnNavigationItemSelectedListener, RecipeScrollAdapter.OnRecipeClickListener {
 
     private EditText ingredientNameEditText;
     private EditText quantityEditText;
@@ -51,7 +49,6 @@ public class RecipeView extends AppCompatActivity
     private RecyclerView recyclerView;
     private RecipeScrollAdapter adapter;
     private ArrayList<RecipeModel> list;
-    private boolean enough = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +60,7 @@ public class RecipeView extends AppCompatActivity
         DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
         list = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecipeScrollAdapter(this,list);
+        adapter = new RecipeScrollAdapter(this,list,this);
         recyclerView.setAdapter(adapter);
         String userN = user.getUsername().split("@")[0].replaceAll("[.#$\\[\\]]", "");
         DatabaseReference userRef = root.child(userN);
@@ -127,7 +124,7 @@ public class RecipeView extends AppCompatActivity
                     return;
                 }
 
-                addRecipe(recipeName, ingredientName, quantity, enough);
+                addRecipe(recipeName, ingredientName, quantity);
             }
         });
     }
@@ -193,7 +190,7 @@ public class RecipeView extends AppCompatActivity
             }
         });
     }
-    private void addRecipe(String recipeName, String ingredientNameList, String quantityList, Boolean enough) {
+    private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
         // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
@@ -223,7 +220,6 @@ public class RecipeView extends AppCompatActivity
             // Loop through each ingredient and quantity pair
             for (int i = 0; i < ingredients.length; i++) {
                 String ingredientName = ingredients[i].trim();
-                enough  = ingredientsViewModel.checkIngredientExists(ingredientName);
                 String quantity = quantities[i].trim();
 
                 // Check if the quantity is a valid number
@@ -269,7 +265,16 @@ public class RecipeView extends AppCompatActivity
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
     }
-
+    public void onRecipeClick(RecipeModel recipeModel) {
+        Intent intent = new Intent(this, RecipeInfo.class);
+        intent.putExtra("recipeName", recipeModel.getRecipeName());
+        StringBuilder ingredientsBuilder = new StringBuilder();
+        for (Map.Entry<String, String> entry : recipeModel.getIngredients().entrySet()) {
+            ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        intent.putExtra("ingredients", ingredientsBuilder.toString());
+        startActivity(intent);
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();

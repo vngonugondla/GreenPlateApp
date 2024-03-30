@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,10 +21,12 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
 
     private Context context;
     private ArrayList<RecipeModel> list;
+    private OnRecipeClickListener onRecipeClickListener;
 
-    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> map) {
+    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> list, OnRecipeClickListener listener) {
         this.context = context;
-        this.list = map;
+        this.list = list;
+        this.onRecipeClickListener = listener;
     }
 
     @NonNull
@@ -36,6 +40,13 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         RecipeModel recipeModel = list.get(position);
         holder.recipeName.setText(recipeModel.getRecipeName());
+        holder.recipeName.setOnClickListener(view->{
+            if(recipeModel.getHasEnoughIngredients()) {
+                onRecipeClickListener.onRecipeClick(recipeModel);
+            } else {
+                Toast.makeText(context,"You don't have enough ingredients to view recipe details", Toast.LENGTH_SHORT).show();
+            }
+        });
         Map<String,String> ingredients = recipeModel.getIngredients();
         StringBuilder ingredientsBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : ingredients.entrySet()) {
@@ -66,5 +77,8 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
             ingredientCheckmark = itemView.findViewById(R.id.ingredientCheckmark);
             ingredientCross = itemView.findViewById(R.id.ingredientCross);
         }
+    }
+    public interface OnRecipeClickListener{
+        void onRecipeClick(RecipeModel recipeModel);
     }
 }
