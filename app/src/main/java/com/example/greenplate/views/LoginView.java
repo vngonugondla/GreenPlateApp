@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.example.greenplate.databinding.LoginScreenBinding;
 import com.example.greenplate.R;
+import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.LoginViewModel;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -44,7 +45,7 @@ public class LoginView extends AppCompatActivity {
 
   
         editTextLoginUsername = findViewById(R.id.editTextLoginUsername);
-        editTextLoginPassword = findViewById(R.id.editTextPassword);
+        editTextLoginPassword = findViewById(R.id.editTextLoginPassword);
         buttonNewUser = findViewById(R.id.new_user);
         buttonLogin = findViewById(R.id.login_button);
 
@@ -60,6 +61,9 @@ public class LoginView extends AppCompatActivity {
                 navigateToHomePage();
             }
         });
+
+        Button exitButton = findViewById(R.id.exit_button);
+        exitButton.setOnClickListener(v -> exitApp(v));
     }
 
 
@@ -74,19 +78,49 @@ public class LoginView extends AppCompatActivity {
         }
     }
 
-    //user signs in
+    //    private void signIn(String email, String password) {
+    //        mAuth.signInWithEmailAndPassword(email, password)
+    //                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+    //                    @Override
+    //                    public void onComplete(@NonNull Task<AuthResult> task) {
+    //                        if (task.isSuccessful()) {
+    //                            // Sign in success, show successful login message
+    //                            Toast.makeText(LoginView.this, "Account successfully created.",
+    //                                    Toast.LENGTH_SHORT).show();
+    //                        } else {
+    //                            // If sign in fails, display a message to the user.
+    //                            Toast.makeText(LoginView.this, "Login failed.",
+    //                                    Toast.LENGTH_SHORT).show();
+    //                        }
+    //                    }
+    //                });
+    //    }
+
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, show successful login message
-                            Toast.makeText(LoginView.this, "Account successfully created.",
-                                    Toast.LENGTH_SHORT).show();
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            if (firebaseUser != null) {
+                                // Here we are using the email as the username.
+                                // If you have a different username, you should adjust accordingly.
+                                String username = firebaseUser.getEmail();
+                                User.getInstance().setUsername(username);
+
+                                // Show successful login message
+                                Toast.makeText(LoginView.this, "Login successful.",
+                                        Toast.LENGTH_SHORT).show();
+
+                                // Navigate to Home Page
+                                navigateToHomePage();
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(LoginView.this, "Login failed.",
+                            Toast.makeText(LoginView.this, "Login failed: "
+                                            + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -112,4 +146,7 @@ public class LoginView extends AppCompatActivity {
         finish();
     }
 
+    public void exitApp(View view) {
+        finishAffinity();
+    }
 }

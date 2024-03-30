@@ -5,10 +5,11 @@ import com.example.greenplate.model.User;
 
 public class AccountCreationViewModel extends ViewModel {
 
-    private User user;
+    private User user = User.getInstance();
 
     public AccountCreationViewModel() {
-        user = new User("", "");
+        user.setUsername("");
+        user.setPassword("");
     }
 
 
@@ -22,7 +23,16 @@ public class AccountCreationViewModel extends ViewModel {
     }
 
     public boolean isValidInput() {
-        return !user.getUsername().isEmpty() && !user.getPassword().isEmpty();
+
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+        if (username == null || username.trim().isEmpty() || password == null
+                || password.trim().isEmpty()) {
+            return false;
+        }
+
+        return password.length() >= 5;
     }
 
     public void setUser(User newUser) {

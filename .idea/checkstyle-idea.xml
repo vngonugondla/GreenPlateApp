@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CheckStyle-IDEA" serialisationVersion="2">
-    <checkstyleVersion>10.13.0</checkstyleVersion>
+    <checkstyleVersion>10.3.4</checkstyleVersion>
     <scanScope>JavaOnly</scanScope>
     <copyLibs>true</copyLibs>
     <option name="thirdPartyClasspath" />
-    <option name="activeLocationIds" />
+    <option name="activeLocationIds">
+      <option value="7ef55fc9-6944-496e-936f-4315ff8413fa" />
+    </option>
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="37118434-a90e-40d3-9da3-6e8e1d50eb8f" type="LOCAL_FILE" scope="All" description="CS_2340_Checkstyle">$PROJECT_DIR$/../cs2340_checks.xml</ConfigurationLocation>
+        <ConfigurationLocation id="7ef55fc9-6944-496e-936f-4315ff8413fa" type="LOCAL_FILE" scope="All" description="cehckstyel for 2340">$PROJECT_DIR$/../../cs2340_checks.xml</ConfigurationLocation>
       </list>
     </option>
   </component>

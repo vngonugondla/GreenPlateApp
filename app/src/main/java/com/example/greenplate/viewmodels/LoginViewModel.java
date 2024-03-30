@@ -2,12 +2,10 @@ package com.example.greenplate.viewmodels;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import android.util.Patterns;
-import android.text.TextUtils;
+
 import com.example.greenplate.BR;
 import com.example.greenplate.model.User;
 
-import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginViewModel extends BaseObservable {
     private User user;
@@ -48,7 +46,7 @@ public class LoginViewModel extends BaseObservable {
     }
 
     public LoginViewModel() {
-        user = new User("", "");
+        user = User.getInstance();
     }
 
     public void onLoginClicked() {
@@ -60,7 +58,15 @@ public class LoginViewModel extends BaseObservable {
     }
 
     public boolean isInputDataValid() {
-        return !TextUtils.isEmpty(getUserUsername()) && Patterns.EMAIL_ADDRESS.matcher(getUserUsername()).matches() && getUserPassword().length() > 5; //add more to this logic
+        String username = getUserUsername();
+        String password = getUserPassword();
+
+        if (username == null || username.trim().isEmpty() || password == null
+                || password.trim().isEmpty()) {
+            return false;
+        }
+
+        return password.length() >= 5;
     }
 
 }

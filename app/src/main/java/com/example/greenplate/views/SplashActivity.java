@@ -6,8 +6,6 @@ import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.greenplate.R;
 
-import com.example.greenplate.views.Home;
-import com.example.greenplate.views.LoginView;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -16,7 +14,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        int SPLASH_TIME_OUT = 2000; // Time in milliseconds
+        int splashtime = 2000; // Time in milliseconds
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -26,6 +24,6 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
 
-        }, SPLASH_TIME_OUT);
+        }, splashtime);
     }
 }
