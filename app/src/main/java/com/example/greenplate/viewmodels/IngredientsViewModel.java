@@ -34,30 +34,6 @@ public class IngredientsViewModel extends ViewModel {
         userInfo = User.getInstance();
         //ingredientsLiveData = new MutableLiveData<>();
     }
-/*
-    public LiveData<List<Ingredient>> getIngredientsLiveData() {
-        return ingredientsLiveData;
-    }
-
-    public void fetchIngredients(String userId) {
-        DatabaseReference userRef = root.child(userId);
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Ingredient> ingredients = new ArrayList<>();
-                for (DataSnapshot ingredientSnapshot: dataSnapshot.getChildren()) {
-                    Ingredient ingredient = ingredientSnapshot.getValue(Ingredient.class);
-                    ingredients.add(ingredient);
-                }
-                ingredientsLiveData.setValue(ingredients);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle possible errors.
-            }
-        });
-    }*/
 
     public boolean isIngredientExists;
 
