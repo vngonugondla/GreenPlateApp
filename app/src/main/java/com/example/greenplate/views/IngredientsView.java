@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IngredientsView extends AppCompatActivity implements
@@ -116,7 +117,20 @@ public class IngredientsView extends AppCompatActivity implements
 
         initializeViews();
         setupRecyclerView();
-        fetchIngredients();
+        //fetchIngredients();
+        fetchIngredients(new IngredientFetchCallback() {
+            @Override
+            public void onIngredientsFetched(List<IngredientsModel> ingredients) {
+                ingredientList.clear();
+                ingredientList.addAll(ingredients);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(IngredientsView.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initializeViews() {
@@ -178,7 +192,12 @@ public class IngredientsView extends AppCompatActivity implements
         recyclerView.setAdapter(adapter);
     }
 
-    private void fetchIngredients() {
+    public interface IngredientFetchCallback {
+        void onIngredientsFetched(List<IngredientsModel> ingredients);
+        void onError(String message);
+    }
+
+    /*private void fetchIngredients() {
         // Assuming you have a User or similar object with a method to retrieve the username
         String username = User.getInstance().getUsername();
         if (username != null && !username.isEmpty()) {
@@ -206,7 +225,47 @@ public class IngredientsView extends AppCompatActivity implements
                 }
             });
         }
+    }*/
+
+    private void fetchIngredients(IngredientFetchCallback callback) {
+        String username = User.getInstance().getUsername();
+        if (username != null && !username.isEmpty()) {
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            DatabaseReference userRef = root.child(sanitizedUsername);
+
+            userRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    List<IngredientsModel> fetchedIngredients = new ArrayList<>();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
+                        String ingredientStr = snapshot.getKey();
+                        Long quantityLong = snapshot.child("quantity").getValue(Long.class);
+                        String quantityStr = String.valueOf(quantityLong);
+                        //String quantityStr = snapshot.child("quantity").getValue(String.class);
+                        //String quantityStr = "999";
+                        String caloriesStr = "999";
+                        String expirationDateStr = "9/9/9";
+                        //String caloriesStr = snapshot.child("calories").getValue(String.class);
+                       // String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
+                        IngredientsModel ingredient = new IngredientsModel(ingredientStr, quantityStr, caloriesStr, expirationDateStr);
+                        if (ingredient != null) {
+                            fetchedIngredients.add(ingredient);
+                        }
+                    }
+                    callback.onIngredientsFetched(fetchedIngredients);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    callback.onError("Failed to load ingredients.");
+                }
+            });
+        } else {
+            callback.onError("Username not set or invalid.");
+        }
     }
+
 
     public void addIngredientToPantry(String ingredientName, String quantity, String calories, String expirationDate) {
         // Retrieve the username (email) from the User singleton instance
