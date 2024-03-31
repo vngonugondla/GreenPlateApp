@@ -2,6 +2,7 @@ package com.example.greenplate.viewmodels;
 
 import android.content.Intent;
 import android.widget.Toast;
+import com.example.greenplate.model.IngredientsModel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
@@ -40,6 +41,26 @@ public class IngredientsViewModel extends ViewModel {
     public interface IngredientCheckCallback {
         void onCheckCompleted(boolean exists);
     }
+
+     public boolean isValidIngredient(IngredientsModel ingredient) {
+        return isNameValid(ingredient.getIngredientName()) &&
+                isCaloriesValid(ingredient.getCalories()) &&
+                isExpirationDateValid(ingredient.getExpirationDate());
+    }
+
+    private boolean isNameValid(String name) {
+        return name != null && !name.trim().isEmpty();
+    }
+
+    private boolean isCaloriesValid(String calories) {
+        try {
+            int cal = Integer.parseInt(calories);
+            return cal >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public void checkIngredientExists(String ingredientName, IngredientCheckCallback callback) {
         // Retrieve the username (email) from the User singleton instance
         String username = userInfo.getUsername();
