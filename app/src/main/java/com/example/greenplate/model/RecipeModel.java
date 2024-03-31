@@ -1,24 +1,39 @@
 package com.example.greenplate.model;
+import java.util.Map;
 
 public class RecipeModel {
-    private int prepTime;
-    private IngredientsModel[] ingredients;
-    private String dietCategory;
+    private String recipeName;
+    private Map<String, String> ingredients;
+    private boolean hasEnoughIngredients;
 
+    public RecipeModel() {
 
-    //implement getters
-    public int getPrepTime() {
-        return prepTime;
     }
-    public IngredientsModel[] getIngredients() {
+    public RecipeModel(String recipeName, Map<String, String> ingredients, Boolean hasEnoughIngredients) {
+        this.recipeName = recipeName;
+        this.ingredients = ingredients;
+        this.hasEnoughIngredients = hasEnoughIngredients;
+    }
+    public String getRecipeName() {
+        return recipeName;
+    }
+
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
+    }
+
+    public Map<String, String> getIngredients() {
         return ingredients;
     }
-    public String getDietCategory() {
-        return dietCategory;
+
+    public void setIngredients(Map<String, String> ingredients) {
+        this.ingredients = ingredients;
     }
 
-    //implement setters
-
-
-
+    public boolean getHasEnoughIngredients() {
+        return hasEnoughIngredients;
+    }
+    public void setHasEnoughIngredients(boolean hasEnoughIngredients) {
+        this.hasEnoughIngredients = hasEnoughIngredients;
+    }
 }
