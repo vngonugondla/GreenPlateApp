@@ -36,17 +36,4 @@ public class RecipeModel {
     public void setHasEnoughIngredients(boolean hasEnoughIngredients) {
         this.hasEnoughIngredients = hasEnoughIngredients;
     }
-
-     public boolean checkIngredientsSufficiency(Map<String, Integer> availableIngredients) {
-        for (Map.Entry<String, String> required : this.ingredients.entrySet()) {
-            String ingredient = required.getKey();
-            int requiredQuantity = Integer.parseInt(required.getValue());
-            Integer availableQuantity = availableIngredients.getOrDefault(ingredient, 0);
-
-            if (availableQuantity < requiredQuantity) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
