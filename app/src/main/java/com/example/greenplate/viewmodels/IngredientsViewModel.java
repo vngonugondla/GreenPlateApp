@@ -2,11 +2,10 @@ package com.example.greenplate.viewmodels;
 
 import android.content.Intent;
 import android.widget.Toast;
-
+import com.example.greenplate.model.IngredientsModel;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.example.greenplate.model.IngredientsModel;
 import com.example.greenplate.model.User;
 import com.example.greenplate.views.IngredientsView;
 import com.example.greenplate.views.InputMealView;
@@ -37,6 +36,8 @@ public class IngredientsViewModel extends ViewModel {
     }
 
     public boolean isIngredientExists;
+
+
 
     public interface IngredientCheckCallback {
         void onCheckCompleted(boolean exists);
@@ -72,6 +73,7 @@ public class IngredientsViewModel extends ViewModel {
         // or a similar class to rigorously validate date formats.
         return expirationDate.matches("\\d{2}/\\d{2}/\\d{4}");
     }
+
     public void checkIngredientExists(String ingredientName, IngredientCheckCallback callback) {
         // Retrieve the username (email) from the User singleton instance
         String username = userInfo.getUsername();
