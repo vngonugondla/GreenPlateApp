@@ -28,7 +28,7 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
         this.list = list;
         this.onRecipeClickListener = listener;
     }
-
+    //code for implementing scrolling mechanism in the Recipe screen
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
