@@ -6,6 +6,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
+import com.example.greenplate.model.IngredientsModel;
 import com.example.greenplate.model.User;
 import com.example.greenplate.views.IngredientsView;
 import com.example.greenplate.views.InputMealView;
