@@ -2,7 +2,7 @@ package com.example.greenplate.viewmodels;
 
 import android.content.Intent;
 import android.widget.Toast;
-
+import com.example.greenplate.model.IngredientsModel;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
@@ -37,9 +37,43 @@ public class IngredientsViewModel extends ViewModel {
 
     public boolean isIngredientExists;
 
+
+
     public interface IngredientCheckCallback {
         void onCheckCompleted(boolean exists);
     }
+
+    public boolean isValidIngredient(IngredientsModel ingredient) {
+        return isNameValid(ingredient.getIngredientName()) &&
+                isCaloriesValid(ingredient.getCalories()) &&
+                isExpirationDateValid(ingredient.getExpirationDate());
+    }
+
+    private boolean isNameValid(String name) {
+        return name != null && !name.trim().isEmpty();
+    }
+
+    private boolean isCaloriesValid(String calories) {
+        try {
+            int cal = Integer.parseInt(calories);
+            return cal >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isExpirationDateValid(String expirationDate) {
+        // Simple format check - ensure the date is not "00/00/0000" and matches a basic date format
+        // This could be enhanced with more sophisticated date parsing/validation
+        if ("00/00/0000".equals(expirationDate) || expirationDate == null) {
+            return false;
+        }
+
+        // Assuming a basic check for date format validity. For real applications, consider using DateTimeFormatter
+        // or a similar class to rigorously validate date formats.
+        return expirationDate.matches("\\d{2}/\\d{2}/\\d{4}");
+    }
+
     public void checkIngredientExists(String ingredientName, IngredientCheckCallback callback) {
         // Retrieve the username (email) from the User singleton instance
         String username = userInfo.getUsername();
