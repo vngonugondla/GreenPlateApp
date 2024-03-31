@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,7 +22,11 @@ import com.example.greenplate.model.RecipeModel;
 import com.example.greenplate.model.RecipeScrollAdapter;
 import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.IngredientsViewModel;
+import com.example.greenplate.viewmodels.RecipeContext;
+import com.example.greenplate.viewmodels.RecipeStrategy;
 import com.example.greenplate.viewmodels.RecipeViewModel;
+import com.example.greenplate.viewmodels.SortAvailability;
+import com.example.greenplate.viewmodels.SortByName;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -49,6 +56,7 @@ public class RecipeView extends AppCompatActivity
     private RecyclerView recyclerView;
     private RecipeScrollAdapter adapter;
     private ArrayList<RecipeModel> list;
+    private Spinner spinner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +73,7 @@ public class RecipeView extends AppCompatActivity
         recyclerView.setAdapter(adapter);
         String userN = user.getUsername().split("@")[0].replaceAll("[.#$\\[\\]]", "");
         DatabaseReference userRef = root.child(userN);
+        spinner = findViewById(R.id.sortingSpinner);
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -75,6 +84,9 @@ public class RecipeView extends AppCompatActivity
                     list.add(new RecipeModel(recipeName, ingredients,false));
                 }
                 checkIngredientSufficiency();
+                RecipeContext context;
+                context = new RecipeContext(new SortAvailability());
+                list = context.executeStrategy(list);
                 adapter.notifyDataSetChanged();
             }
             @Override
@@ -87,7 +99,6 @@ public class RecipeView extends AppCompatActivity
         scrollUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Scroll up by a certain amount (e.g., 100 pixels)
                 recyclerView.scrollBy(0, -100);
             }
         });
@@ -95,7 +106,6 @@ public class RecipeView extends AppCompatActivity
         scrollDownButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Scroll down by a certain amount (e.g., 100 pixels)
                 recyclerView.scrollBy(0, 100);
             }
         });
@@ -115,7 +125,7 @@ public class RecipeView extends AppCompatActivity
         addIngredientButton.setOnClickListener(v -> {
             String recipeName = recipeNameEditText.getText().toString();
             String ingredientName = ingredientNameEditText.getText().toString();
-            String quantity = quantityEditText.getText().toString().trim(); // Trim any leading or trailing spaces
+            String quantity = quantityEditText.getText().toString().trim();
             if (recipeName.isEmpty() || ingredientName.isEmpty() || quantity.isEmpty()) {
                 Toast.makeText(RecipeView.this,
                         "Please enter both recipe name, ingredient name, and quantity",
@@ -144,6 +154,37 @@ public class RecipeView extends AppCompatActivity
                 addRecipe(recipeName, ingredientName, quantity);
             }
         });
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.sorting_options, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        applySortingStrategy(new SortAvailability());
+                        break;
+                    case 1:
+                        applySortingStrategy(new SortByName());
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void applySortingStrategy(RecipeStrategy strategy) {
+        if (list != null && !list.isEmpty()) {
+            RecipeContext context = new RecipeContext(strategy);
+            list = context.executeStrategy(list);
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
     private void checkIngredientSufficiency() {
         String username = user.getUsername();
