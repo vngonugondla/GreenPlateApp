@@ -75,15 +75,8 @@ public class RecipeView extends AppCompatActivity
                             "Please enter both recipe name, ingredient name, and quantity",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    // Split the quantity string by commas and concatenate the resulting substrings
                     String[] quantityParts = quantity.split(",");
-                    //StringBuilder quantityBuilder = new StringBuilder();
-                    //for (String part : quantityParts) {
-                    //    quantityBuilder.append(part.trim()); // Trim any leading or trailing spaces in each part
-                    //}
-                    //quantity = quantityBuilder.toString();
-
-                    // Check if the quantity is a valid number
+                    
                     try {
                         //double quantityValue = Double.parseDouble(quantity);
                         for (String part: quantityParts) {
@@ -110,17 +103,12 @@ public class RecipeView extends AppCompatActivity
     }
 
     private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
-        // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
-            // Use only the part before the '@' symbol in the email as the key
-            // and remove any periods or other illegal characters
             String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
 
-            // Use the sanitized username to create a reference in your database
             DatabaseReference userRef = root.child(sanitizedUsername);
 
-            // Create a map to store ingredients and their quantities
             Map<String, String> recipeIngredients = new HashMap<>();
 
             // Split the ingredientNameList string by commas to get individual ingredients
@@ -161,7 +149,6 @@ public class RecipeView extends AppCompatActivity
                 recipeIngredients.put(ingredientName, quantity);
             }
 
-            // Add the recipe name and its ingredients to the user's reference
             userRef.child(recipeName).setValue(recipeIngredients)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -170,7 +157,7 @@ public class RecipeView extends AppCompatActivity
                                     "Recipe added to cookbook.",
                                     Toast.LENGTH_SHORT).show();
 
-                            // Navigate to the desired activity after successful addition
+                        
                             Intent intent = new Intent(RecipeView.this, InputMealView.class);
                             startActivity(intent);
                         }
