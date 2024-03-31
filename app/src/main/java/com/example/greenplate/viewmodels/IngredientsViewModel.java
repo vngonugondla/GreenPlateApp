@@ -61,27 +61,31 @@ public class IngredientsViewModel extends ViewModel {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        // Ingredient exists, check if quantity is nonzero
-                        String quantityStr = snapshot.child("quantity").getValue(String.class);
-                        Double quantity = Double.parseDouble(quantityStr);
+                        Object quantityObj = snapshot.child("quantity").getValue();
+                        Double quantity = null;
+                        if (quantityObj instanceof Long) {
+                            quantity = ((Long) quantityObj).doubleValue();
+                        } else if (quantityObj instanceof String) {
+                            try {
+                                quantity = Double.parseDouble((String) quantityObj);
+                            } catch (NumberFormatException e) {
+                            }
+                        }
                         if (quantity != null && quantity > 0) {
-                            callback.onCheckCompleted(true); // Ingredient exists and has a positive quantity
+                            callback.onCheckCompleted(true);
                         } else {
-                            callback.onCheckCompleted(false); // Quantity is null, zero, or the key does not exist
+                            callback.onCheckCompleted(false);
                         }
                     } else {
-                        callback.onCheckCompleted(false); // Ingredient does not exist
+                        callback.onCheckCompleted(false);
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    // Handle error - might want to call callback with false or specific error handling
-                    // error
+                    //Handle error - might want to call callback with false or specific error handling
                 }
             });
         } else {
-            // Handle the case where username is not available - assuming ingredient doesn't exist
             callback.onCheckCompleted(false);
         }
 

@@ -78,7 +78,7 @@ public class RecipeView extends AppCompatActivity
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(RecipeView.this, "Error fetching recipes: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -161,12 +161,17 @@ public class RecipeView extends AppCompatActivity
                                     hasEnough = false;
                                     break;
                                 }
-                                String pantryQuantityStr = pantryIngredientSnapshot.child("quantity").getValue(String.class);
-                                if (pantryQuantityStr == null) {
+                                Object pantryQuantityObj = pantryIngredientSnapshot.child("quantity").getValue();
+                                int pantryQuantity = 0;
+                                if (pantryQuantityObj instanceof Long) {
+                                    pantryQuantity = ((Long) pantryQuantityObj).intValue();
+                                } else if (pantryQuantityObj instanceof String) {
+                                    pantryQuantity = Integer.parseInt((String) pantryQuantityObj);
+                                } else {
                                     hasEnough = false;
                                     break;
                                 }
-                                int pantryQuantity = Integer.parseInt(pantryQuantityStr);
+
                                 if (pantryQuantity < requiredQuantity) {
                                     hasEnough = false;
                                     break;
@@ -190,6 +195,7 @@ public class RecipeView extends AppCompatActivity
             }
         });
     }
+
     private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
         // Retrieve the username (email) from the User singleton instance
         String username = user.getUsername();

@@ -156,13 +156,10 @@ public class IngredientsView extends AppCompatActivity implements
         String calories = caloriesEditText.getText().toString().trim();
         String expirationDate = expirationDateEditText.getText().toString().trim();
 
-        // Check for empty fields
         if (ingredientName.isEmpty() || quantity.isEmpty() || calories.isEmpty()) {
             Toast.makeText(IngredientsView.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Check if quantity is a positive number
         try {
             double quantityValue = Double.parseDouble(quantity);
             if (quantityValue <= 0) {
@@ -173,8 +170,6 @@ public class IngredientsView extends AppCompatActivity implements
             Toast.makeText(IngredientsView.this, "Invalid quantity entered.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Check if the ingredient already exists in the pantry
         viewModel.checkIngredientExists(ingredientName, exists -> {
             if (exists) {
                 Toast.makeText(IngredientsView.this, "Ingredient already exists in pantry.", Toast.LENGTH_SHORT).show();
@@ -188,7 +183,7 @@ public class IngredientsView extends AppCompatActivity implements
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.ingredients_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new IngredientsAdapter(ingredientList, root); // Ensure the constructor matches your setup
+        adapter = new IngredientsAdapter(ingredientList, root);
         recyclerView.setAdapter(adapter);
     }
 
@@ -241,9 +236,8 @@ public class IngredientsView extends AppCompatActivity implements
                         //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
                         String ingredientStr = snapshot.getKey();
                         String quantityStr;
-
                         Object quantityObj = snapshot.child("quantity").getValue();
-                        if (quantityObj instanceof Long) {
+                        if (quantityObj instanceof Long || quantityObj instanceof Integer) {
                             quantityStr = String.valueOf(quantityObj);
                         } else if (quantityObj instanceof String) {
                             // Here, you can directly use the string or attempt to parse it as a long if necessary
@@ -257,16 +251,16 @@ public class IngredientsView extends AppCompatActivity implements
                                 quantityStr = "Invalid Format"; // Adjust based on how you want to handle this
                             }
                         } else {
-                            // Handle other types or null
                             quantityStr = "Unknown Quantity"; // Adjust accordingly
                         }
 
+
                         //String quantityStr = snapshot.child("quantity").getValue(String.class);
                         //String quantityStr = "999";
-                        String caloriesStr = "999";
-                        String expirationDateStr = "9/9/9";
-                        //String caloriesStr = snapshot.child("calories").getValue(String.class);
-                       // String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
+                        //String caloriesStr = "999";
+                        //String expirationDateStr = "9/9/9";
+                        String caloriesStr = snapshot.child("calories").getValue(String.class);
+                        String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
                         IngredientsModel ingredient = new IngredientsModel(ingredientStr, quantityStr, caloriesStr, expirationDateStr);
                         if (ingredient != null) {
                             fetchedIngredients.add(ingredient);
@@ -312,7 +306,7 @@ public class IngredientsView extends AppCompatActivity implements
                                     Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(
                                     IngredientsView.this,
-                                    InputMealView.class);
+                                    IngredientsView.class);
                             startActivity(intent);
                         }
                     })
