@@ -44,8 +44,7 @@ public class IngredientsViewModel extends ViewModel {
 
      public boolean isValidIngredient(IngredientsModel ingredient) {
         return isNameValid(ingredient.getIngredientName()) &&
-                isCaloriesValid(ingredient.getCalories()) &&
-                isExpirationDateValid(ingredient.getExpirationDate());
+                isCaloriesValid(ingredient.getCalories());
     }
 
     private boolean isNameValid(String name) {
