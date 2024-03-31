@@ -29,6 +29,7 @@ public class IngredientsModel {
         this.expirationDate = expirationDate;
     }
 
+    //getter and setter methods
     public String getIngredientName() { return ingredientName; }
 
     public String getQuantity() { return quantity; }
