@@ -57,6 +57,7 @@ public class RecipeView extends AppCompatActivity
         recyclerView = findViewById(R.id.recipeScrollList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(true);
         DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
         list = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,7 +82,23 @@ public class RecipeView extends AppCompatActivity
                 Toast.makeText(RecipeView.this, "Error fetching recipes: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        Button scrollUpButton = findViewById(R.id.scrollUpButton);
+        Button scrollDownButton = findViewById(R.id.scrollDownButton);
+        scrollUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Scroll up by a certain amount (e.g., 100 pixels)
+                recyclerView.scrollBy(0, -100);
+            }
+        });
 
+        scrollDownButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Scroll down by a certain amount (e.g., 100 pixels)
+                recyclerView.scrollBy(0, 100);
+            }
+        });
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         Button personalInfoButton = findViewById(R.id.personalInfoButton);

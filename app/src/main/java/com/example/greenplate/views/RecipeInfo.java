@@ -26,8 +26,8 @@ public class RecipeInfo extends AppCompatActivity implements BottomNavigationVie
         String ingredients = intent.getStringExtra("ingredients");
         recipeNameTextView.setText(recipeName);
         ingredientsTextView.setText(ingredients);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        //bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
