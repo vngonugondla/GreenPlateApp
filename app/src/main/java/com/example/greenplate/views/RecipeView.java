@@ -39,7 +39,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 public class RecipeView extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener, RecipeScrollAdapter.OnRecipeClickListener {
+        implements BottomNavigationView.OnNavigationItemSelectedListener,
+        RecipeScrollAdapter.OnRecipeClickListener {
 
     private EditText ingredientNameEditText;
     private EditText quantityEditText;
@@ -66,10 +67,11 @@ public class RecipeView extends AppCompatActivity
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setNestedScrollingEnabled(true);
-        DatabaseReference cookbookRef = FirebaseDatabase.getInstance().getReference().child("Cookbook");
+        DatabaseReference cookbookRef = FirebaseDatabase.getInstance()
+                .getReference().child("Cookbook");
         list = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecipeScrollAdapter(this,list,this);
+        adapter = new RecipeScrollAdapter(this, list, this);
         recyclerView.setAdapter(adapter);
         String userN = user.getUsername().split("@")[0].replaceAll("[.#$\\[\\]]", "");
         DatabaseReference userRef = root.child(userN);
@@ -80,8 +82,8 @@ public class RecipeView extends AppCompatActivity
                 list.clear();
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     String recipeName = dataSnapshot.getKey();
-                    Map<String,String> ingredients = (Map<String,String>) dataSnapshot.getValue();
-                    list.add(new RecipeModel(recipeName, ingredients,false));
+                    Map<String, String> ingredients = (Map<String, String>) dataSnapshot.getValue();
+                    list.add(new RecipeModel(recipeName, ingredients, false));
                 }
                 checkIngredientSufficiency();
                 RecipeContext context;
@@ -91,7 +93,8 @@ public class RecipeView extends AppCompatActivity
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(RecipeView.this, "Error fetching recipes: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RecipeView.this, "Error fetching recipes: "
+                        + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         Button scrollUpButton = findViewById(R.id.scrollUpButton);
@@ -168,6 +171,8 @@ public class RecipeView extends AppCompatActivity
                     case 1:
                         applySortingStrategy(new SortByName());
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -189,16 +194,20 @@ public class RecipeView extends AppCompatActivity
     private void checkIngredientSufficiency() {
         String username = user.getUsername();
         if (username == null || username.isEmpty()) {
-            Toast.makeText(RecipeView.this, "Username is not set. Please log in.", Toast.LENGTH_LONG).show();
+            Toast.makeText(RecipeView.this,
+                    "Username is not set. Please log in.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        DatabaseReference pantryRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(username.split("@")[0].replaceAll("[.#$\\[\\]]", ""));
+        DatabaseReference pantryRef = FirebaseDatabase.getInstance().getReference()
+                .child("Pantry").child(username.split("@")[0]
+                        .replaceAll("[.#$\\[\\]]", ""));
         pantryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot pantrySnapshot) {
                 if (!pantrySnapshot.exists()) {
-                    Toast.makeText(RecipeView.this, "Pantry data not found.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RecipeView.this, "Pantry data not found.",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (RecipeModel recipe : list) {
@@ -213,13 +222,15 @@ public class RecipeView extends AppCompatActivity
                             String requiredQuantityStr = entry.getValue();
                             try {
                                 int requiredQuantity = Integer.parseInt(requiredQuantityStr);
-                                DataSnapshot pantryIngredientSnapshot = pantrySnapshot.child(ingredient);
+                                DataSnapshot pantryIngredientSnapshot = pantrySnapshot
+                                        .child(ingredient);
 
                                 if (!pantryIngredientSnapshot.exists()) {
                                     hasEnough = false;
                                     break;
                                 }
-                                Object pantryQuantityObj = pantryIngredientSnapshot.child("quantity").getValue();
+                                Object pantryQuantityObj = pantryIngredientSnapshot
+                                        .child("quantity").getValue();
                                 int pantryQuantity = 0;
                                 if (pantryQuantityObj instanceof Long) {
                                     pantryQuantity = ((Long) pantryQuantityObj).intValue();
@@ -249,7 +260,8 @@ public class RecipeView extends AppCompatActivity
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(RecipeView.this, "Failed to fetch pantry data.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RecipeView.this, "Failed to fetch pantry data.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -257,7 +269,8 @@ public class RecipeView extends AppCompatActivity
     private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
-            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]",
+                    "");
 
             DatabaseReference userRef = root.child(sanitizedUsername);
 
@@ -328,7 +341,8 @@ public class RecipeView extends AppCompatActivity
         intent.putExtra("recipeName", recipeModel.getRecipeName());
         StringBuilder ingredientsBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : recipeModel.getIngredients().entrySet()) {
-            ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+            ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue())
+                    .append("\n");
         }
         intent.putExtra("ingredients", ingredientsBuilder.toString());
         startActivity(intent);

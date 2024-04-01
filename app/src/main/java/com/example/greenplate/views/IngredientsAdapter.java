@@ -17,7 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
 
-public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.IngredientViewHolder> {
+public class IngredientsAdapter extends
+        RecyclerView.Adapter<IngredientsAdapter.IngredientViewHolder> {
     private List<IngredientsModel> ingredientsList;
 
     private User user = User.getInstance();
@@ -33,7 +34,8 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
     @NonNull
     @Override
     public IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_ingredient_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.activity_ingredient_item, parent, false);
         return new IngredientViewHolder(view);
     }
 
@@ -51,8 +53,10 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
 
     public class IngredientViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView ingredientNameTextView, quantityTextView;
-        private Button increaseButton, decreaseButton;
+        private TextView ingredientNameTextView;
+        private TextView quantityTextView;
+        private Button increaseButton;
+        private Button decreaseButton;
 
         public IngredientViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -70,7 +74,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
             decreaseButton.setOnClickListener(v -> adjustIngredientQuantity(ingredient, false));
         }
 
-        DatabaseReference userRef;
+        private DatabaseReference userRef;
         private void adjustIngredientQuantity(IngredientsModel ingredient, boolean increase) {
             String username = user.getUsername();
             if (username != null && !username.isEmpty()) {
@@ -89,18 +93,33 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
             if (newQuantity <= 0) {
                 // Remove the ingredient from Firebase
                 userRef.child(ingredient.getIngredientName()).removeValue()
-                        .addOnSuccessListener(aVoid -> Toast.makeText(itemView.getContext(), ingredient.getIngredientName() + " removed.", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(itemView.getContext(), "Error removing " + ingredient.getIngredientName(), Toast.LENGTH_SHORT).show());
+                        .addOnSuccessListener(aVoid -> Toast.makeText(itemView.getContext(),
+                                ingredient.getIngredientName() + " removed.",
+                                Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Toast.makeText(itemView.getContext(),
+                                "Error removing " + ingredient.getIngredientName(),
+                                Toast.LENGTH_SHORT).show());
             } else {
                 // Update the quantity in Firebase
-                userRef.child(ingredient.getIngredientName()).child("quantity").setValue(newQuantity)
+                userRef.child(ingredient.getIngredientName())
+                        .child("quantity").setValue(newQuantity)
                         .addOnSuccessListener(aVoid -> {
                             // Update the displayed quantity
                             quantityTextView.setText(String.format("%.0f", newQuantity));
                             ingredient.setQuantity(String.valueOf(newQuantity));
                         })
-                        .addOnFailureListener(e -> Toast.makeText(itemView.getContext(), "Error updating quantity for " + ingredient.getIngredientName(), Toast.LENGTH_SHORT).show());
+                        .addOnFailureListener(e -> Toast.makeText(itemView.getContext(),
+                                "Error updating quantity for " + ingredient.getIngredientName(),
+                                Toast.LENGTH_SHORT).show());
             }
         }
+        public DatabaseReference getUserRef() {
+            return userRef;
+        }
+
+        public void setUserRef(DatabaseReference userRef) {
+            this.userRef = userRef;
+        }
+
     }
 }
