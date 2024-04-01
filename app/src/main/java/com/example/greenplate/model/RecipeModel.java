@@ -9,7 +9,8 @@ public class RecipeModel {
     public RecipeModel() {
 
     }
-    public RecipeModel(String recipeName, Map<String, String> ingredients, Boolean hasEnoughIngredients) {
+    public RecipeModel(String recipeName, Map<String, String> ingredients,
+                       Boolean hasEnoughIngredients) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.hasEnoughIngredients = hasEnoughIngredients;
@@ -36,7 +37,7 @@ public class RecipeModel {
     public void setHasEnoughIngredients(boolean hasEnoughIngredients) {
         this.hasEnoughIngredients = hasEnoughIngredients;
     }
-     public boolean checkIngredientsSufficiency(Map<String, Integer> availableIngredients) {
+    public boolean checkIngredientsSufficiency(Map<String, Integer> availableIngredients) {
         for (Map.Entry<String, String> required : this.ingredients.entrySet()) {
             String ingredient = required.getKey();
             int requiredQuantity = Integer.parseInt(required.getValue());

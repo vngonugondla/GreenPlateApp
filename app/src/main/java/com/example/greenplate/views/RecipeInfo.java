@@ -11,7 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.greenplate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class RecipeInfo extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class RecipeInfo extends AppCompatActivity implements
+        BottomNavigationView.OnNavigationItemSelectedListener {
     private TextView recipeNameTextView;
     private TextView ingredientsTextView;
     private TextView quantitiesTextView;

@@ -2,20 +2,19 @@ package com.example.greenplate.model;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapter.MyViewHolder> {
 
@@ -23,7 +22,8 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     private ArrayList<RecipeModel> list;
     private OnRecipeClickListener onRecipeClickListener;
 
-    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> list, OnRecipeClickListener listener) {
+    public RecipeScrollAdapter(Context context, ArrayList<RecipeModel> list,
+                               OnRecipeClickListener listener) {
         this.context = context;
         this.list = list;
         this.onRecipeClickListener = listener;
@@ -32,7 +32,8 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.recipeitem,parent,false);
+        View v = LayoutInflater.from(context).inflate(R.layout.recipeitem,
+                parent, false);
         return new MyViewHolder(v);
     }
 
@@ -40,17 +41,20 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         RecipeModel recipeModel = list.get(position);
         holder.recipeName.setText(recipeModel.getRecipeName());
-        holder.recipeName.setOnClickListener(view->{
-            if(recipeModel.getHasEnoughIngredients()) {
+        holder.recipeName.setOnClickListener(view -> {
+            if (recipeModel.getHasEnoughIngredients()) {
                 onRecipeClickListener.onRecipeClick(recipeModel);
             } else {
-                Toast.makeText(context,"You don't have enough ingredients to view recipe details", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,
+                        "You don't have enough ingredients to view recipe details",
+                        Toast.LENGTH_SHORT).show();
             }
         });
-        Map<String,String> ingredients = recipeModel.getIngredients();
+        Map<String, String> ingredients = recipeModel.getIngredients();
         StringBuilder ingredientsBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : ingredients.entrySet()) {
-            ingredientsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+            ingredientsBuilder.append(entry.getKey()).append(": ")
+                    .append(entry.getValue()).append("\n");
         }
         holder.ingredients.setText(ingredientsBuilder.toString());
         if (recipeModel.getHasEnoughIngredients()) {
@@ -68,8 +72,11 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     public int getItemCount() {
         return list.size();
     }
-    public static class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView recipeName, ingredients, ingredientCheckmark, ingredientCross;
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+        private TextView recipeName;
+        private TextView ingredients;
+        private TextView ingredientCheckmark;
+        private TextView ingredientCross;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeName = itemView.findViewById(R.id.textrecipe);
@@ -78,7 +85,7 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
             ingredientCross = itemView.findViewById(R.id.ingredientCross);
         }
     }
-    public interface OnRecipeClickListener{
+    public interface OnRecipeClickListener {
         void onRecipeClick(RecipeModel recipeModel);
     }
 }
