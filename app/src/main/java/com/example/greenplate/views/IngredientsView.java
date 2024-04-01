@@ -148,7 +148,13 @@ public class IngredientsView extends AppCompatActivity implements
         viewModel = new ViewModelProvider(this).get(IngredientsViewModel.class);
 
         submitButton.setOnClickListener(v -> handleSubmitButtonClick());
+        Button scrollUpButton = findViewById(R.id.scrollUpButton1);
+        Button scrollDownButton = findViewById(R.id.scrollDownButton1);
+        scrollUpButton.setOnClickListener(v -> recyclerView.scrollBy(0, -150));
+        scrollDownButton.setOnClickListener(v -> recyclerView.scrollBy(0, 150));
+
     }
+
 
     private void handleSubmitButtonClick() {
         String ingredientName = ingredientNameEditText.getText().toString().trim();
@@ -178,7 +184,6 @@ public class IngredientsView extends AppCompatActivity implements
             }
         });
     }
-
 
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.ingredients_list);
@@ -254,11 +259,6 @@ public class IngredientsView extends AppCompatActivity implements
                             quantityStr = "Unknown Quantity"; // Adjust accordingly
                         }
 
-
-                        //String quantityStr = snapshot.child("quantity").getValue(String.class);
-                        //String quantityStr = "999";
-                        //String caloriesStr = "999";
-                        //String expirationDateStr = "9/9/9";
                         String caloriesStr = snapshot.child("calories").getValue(String.class);
                         String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
                         IngredientsModel ingredient = new IngredientsModel(ingredientStr, quantityStr, caloriesStr, expirationDateStr);
