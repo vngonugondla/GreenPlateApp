@@ -77,6 +77,8 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
         private TextView ingredients;
         private TextView ingredientCheckmark;
         private TextView ingredientCross;
+
+        //viewholder for recipiescroll adapter
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeName = itemView.findViewById(R.id.textrecipe);

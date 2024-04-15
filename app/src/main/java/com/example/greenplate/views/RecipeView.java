@@ -58,6 +58,7 @@ public class RecipeView extends AppCompatActivity
     private RecipeScrollAdapter adapter;
     private ArrayList<RecipeModel> list;
     private Spinner spinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
