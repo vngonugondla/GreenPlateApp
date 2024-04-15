@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.util.Log;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
+import com.example.greenplate.model.IngredientsModel;
 import com.example.greenplate.model.RecipeModel;
 import com.example.greenplate.model.RecipeScrollAdapter;
 import com.example.greenplate.model.User;
@@ -38,6 +41,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 public class RecipeView extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         RecipeScrollAdapter.OnRecipeClickListener {
@@ -57,6 +62,7 @@ public class RecipeView extends AppCompatActivity
     private RecyclerView recyclerView;
     private RecipeScrollAdapter adapter;
     private ArrayList<RecipeModel> list;
+    private ArrayList<IngredientsModel> ingredientsList;
     private Spinner spinner;
 
     @Override
@@ -71,6 +77,7 @@ public class RecipeView extends AppCompatActivity
         DatabaseReference cookbookRef = FirebaseDatabase.getInstance()
                 .getReference().child("Cookbook");
         list = new ArrayList<>();
+        ingredientsList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecipeScrollAdapter(this, list, this);
         recyclerView.setAdapter(adapter);
@@ -84,7 +91,7 @@ public class RecipeView extends AppCompatActivity
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     String recipeName = dataSnapshot.getKey();
                     Map<String, String> ingredients = (Map<String, String>) dataSnapshot.getValue();
-                    list.add(new RecipeModel(recipeName, ingredients, false));
+                    list.add(new RecipeModel(recipeName, ingredients, false, ingredientsList));
                 }
                 checkIngredientSufficiency();
                 RecipeContext context;
@@ -98,21 +105,7 @@ public class RecipeView extends AppCompatActivity
                         + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        Button scrollUpButton = findViewById(R.id.scrollUpButton);
-        Button scrollDownButton = findViewById(R.id.scrollDownButton);
-        scrollUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerView.scrollBy(0, -100);
-            }
-        });
 
-        scrollDownButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerView.scrollBy(0, 100);
-            }
-        });
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         Button personalInfoButton = findViewById(R.id.personalInfoButton);
@@ -212,50 +205,68 @@ public class RecipeView extends AppCompatActivity
                     return;
                 }
                 for (RecipeModel recipe : list) {
+                    ArrayList<IngredientsModel> ingredientsList = new ArrayList<>();
                     boolean hasEnough = true;
                     Map<String, String> ingredients = recipe.getIngredients();
-
                     if (ingredients == null) {
                         hasEnough = false;
                     } else {
                         for (Map.Entry<String, String> entry : ingredients.entrySet()) {
                             String ingredient = entry.getKey();
-                            String requiredQuantityStr = entry.getValue();
+                            int requiredQuantity = Integer.parseInt(entry.getValue());
                             try {
-                                int requiredQuantity = Integer.parseInt(requiredQuantityStr);
                                 DataSnapshot pantryIngredientSnapshot = pantrySnapshot
                                         .child(ingredient);
-
                                 if (!pantryIngredientSnapshot.exists()) {
                                     hasEnough = false;
+                                    for (Map.Entry<String, String> entry1 : ingredients.entrySet()) {
+                                        String ingredientName = entry1.getKey();
+                                        int requiredAmount = Integer.parseInt(entry1.getValue());
+                                        ingredientsList.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
+                                        Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
+                                    }
                                     break;
-                                }
-                                Object pantryQuantityObj = pantryIngredientSnapshot
-                                        .child("quantity").getValue();
-                                int pantryQuantity = 0;
-                                if (pantryQuantityObj instanceof Long) {
-                                    pantryQuantity = ((Long) pantryQuantityObj).intValue();
-                                } else if (pantryQuantityObj instanceof String) {
-                                    pantryQuantity = Integer.parseInt((String) pantryQuantityObj);
                                 } else {
-                                    hasEnough = false;
-                                    break;
+                                    Object pantryQuantityObj = pantryIngredientSnapshot
+                                            .child("quantity").getValue();
+                                    Object pantryCaloriesObj = pantryIngredientSnapshot.child("calories").getValue();
+                                    Object pantryExpirationDateObj = pantryIngredientSnapshot.child("expirationDate");
+                                    int pantryQuantity = 0;
+                                    if (pantryQuantityObj instanceof Long) {
+                                        pantryQuantity = ((Long) pantryQuantityObj).intValue();
+                                    } else if (pantryQuantityObj instanceof String) {
+                                        pantryQuantity = Integer.parseInt((String) pantryQuantityObj);
+                                    } else {
+                                        hasEnough = false;
+                                    }
+                                    if (pantryQuantity < requiredQuantity) {
+                                        hasEnough = false;
+                                    }
+                                    int pantryCalories = 0;
+                                    if (pantryCaloriesObj instanceof Long) {
+                                        pantryCalories = ((Long) pantryCaloriesObj).intValue();
+                                    } else if (pantryCaloriesObj instanceof String) {
+                                        pantryCalories = Integer.parseInt((String) pantryCaloriesObj);
+                                    } else {
+                                        break;
+                                    }
+                                    String pantryExpiry = pantryExpirationDateObj.toString();
+                                    ingredientsList.add(new IngredientsModel(ingredient, String.valueOf(pantryQuantity), String.valueOf(pantryCalories), pantryExpiry));
+                                    Log.d("RecipeView", "Added Ingredient - Name: " + ingredient + ", Quantity: " + pantryQuantity + ", Calories: " + pantryCalories + ", Expiry: " + pantryExpiry);
                                 }
 
-                                if (pantryQuantity < requiredQuantity) {
-                                    hasEnough = false;
-                                    break;
-                                }
                             } catch (NumberFormatException e) {
                                 hasEnough = false;
                                 break;
                             }
+
                         }
                     }
-
+                    Log.d("RecipeView", "Final Ingredients List for Recipe '" + recipe.getRecipeName() + "': " + ingredientsList.stream()
+                            .map(ingredient -> ingredient.getIngredientName() + " - Qty: " + ingredient.getQuantity() + ", Cal: " + ingredient.getCalories() + ", Exp: " + ingredient.getExpirationDate())
+                            .collect(Collectors.joining(", ")));
                     recipe.setHasEnoughIngredients(hasEnough);
                 }
-
                 adapter.notifyDataSetChanged();
             }
 

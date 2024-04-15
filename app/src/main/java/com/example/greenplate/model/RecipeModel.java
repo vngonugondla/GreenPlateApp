@@ -12,21 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.greenplate.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 public class RecipeModel {
     private String recipeName;
     private Map<String, String> ingredients;
     private boolean hasEnoughIngredients;
+    private ArrayList<IngredientsModel> ingredientsList;
 
     public RecipeModel() {
 
     }
     public RecipeModel(String recipeName, Map<String, String> ingredients,
-                       Boolean hasEnoughIngredients) {
+                       Boolean hasEnoughIngredients, ArrayList <IngredientsModel> ingredientsList) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.hasEnoughIngredients = hasEnoughIngredients;
+        this.ingredientsList = ingredientsList;
     }
     public String getRecipeName() {
         return recipeName;
@@ -50,12 +53,18 @@ public class RecipeModel {
     public void setHasEnoughIngredients(boolean hasEnoughIngredients) {
         this.hasEnoughIngredients = hasEnoughIngredients;
     }
+    public ArrayList<IngredientsModel> getIngredientsList() {
+        return ingredientsList;
+    }
+
+    public void setIngList(ArrayList<IngredientsModel> ingredientsList) {
+        this.ingredientsList = ingredientsList;
+    }
     public boolean checkIngredientsSufficiency(Map<String, Integer> availableIngredients) {
         for (Map.Entry<String, String> required : this.ingredients.entrySet()) {
             String ingredient = required.getKey();
             int requiredQuantity = Integer.parseInt(required.getValue());
             Integer availableQuantity = availableIngredients.getOrDefault(ingredient, 0);
-
             if (availableQuantity < requiredQuantity) {
                 return false;
             }
