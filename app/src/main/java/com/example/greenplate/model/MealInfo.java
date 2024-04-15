@@ -15,6 +15,7 @@ public class MealInfo {
         this.date = date;
     }
 
+    //getters and setters below to access MealInfo in other classes.
     public String getMealName() {
         return mealName;
     }
