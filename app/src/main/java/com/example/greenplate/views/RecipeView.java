@@ -266,6 +266,7 @@ public class RecipeView extends AppCompatActivity
         });
     }
 
+                // adds recipe to database
     private void addRecipe(String recipeName, String ingredientNameList, String quantityList) {
         String username = user.getUsername();
         if (username != null && !username.isEmpty()) {
