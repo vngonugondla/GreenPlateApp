@@ -47,7 +47,7 @@ public class ShoppingListView extends AppCompatActivity
 
     private DatabaseReference root;
     private RecyclerView recyclerView;
-    private ShoppingListAdapter adapter;
+    private com.example.greenplate.views.ShoppingListAdapter adapter;
     private ArrayList<ShoppingListModel> shoppingItemList = new ArrayList<>();
 
     @Override
@@ -111,7 +111,7 @@ public class ShoppingListView extends AppCompatActivity
                         String expirationDateStr = snapshot.child("expirationDate")
                                 .getValue(String.class);
                         ShoppingListModel ingredient = new ShoppingListModel(ingredientStr,
-                               Integer.parseInt(quantityStr));
+                               quantityStr);
                         if (ingredient != null) {
                             fetchedIngredients.add(ingredient);
                         }
@@ -252,7 +252,7 @@ public class ShoppingListView extends AppCompatActivity
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.shopping_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ShoppingListAdapter(shoppingItemList, root);
+        adapter = new com.example.greenplate.views.ShoppingListAdapter(shoppingItemList, root);
         recyclerView.setAdapter(adapter);
     }
 
