@@ -70,21 +70,22 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     public class ShoppingListViewHolder extends RecyclerView.ViewHolder {
 
-        private CheckBox itemNameTextView;
+        private CheckBox itemNameCheckBox;
         private TextView quantityTextView;
         private Button increaseButton;
         private Button decreaseButton;
 
         public ShoppingListViewHolder(@NonNull View itemView) {
             super(itemView);
-            itemNameTextView = itemView.findViewById(R.id.SLItemTextView);
+            itemNameCheckBox = itemView.findViewById(R.id.SLItemTextView);
             quantityTextView = itemView.findViewById(R.id.SLQuantityTextView);
             increaseButton = itemView.findViewById(R.id.SLIncreaseButton);
             decreaseButton = itemView.findViewById(R.id.SLDecreaseButton);
         }
 
         public void bind(ShoppingListModel item) {
-            itemNameTextView.setText(item.getShoppingItemName());
+            itemNameCheckBox.setText(item.getShoppingItemName());
+            itemNameCheckBox.setChecked(false);
             quantityTextView.setText(String.valueOf(item.getQuantity()));
 
             increaseButton.setOnClickListener(v -> adjustIngredientQuantity(item, true));
@@ -138,6 +139,18 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         public void setUserRef(DatabaseReference userRef) {
             this.userRef = userRef;
+        }
+
+        public boolean isChecked() {
+            return itemNameCheckBox.isChecked();
+        }
+
+        public String getItemName() {
+            return itemNameCheckBox.getText().toString();
+        }
+
+        public String getQuantity() {
+            return quantityTextView.getText().toString();
         }
 
     /*

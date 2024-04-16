@@ -58,6 +58,9 @@ public class ShoppingListView extends AppCompatActivity
         initializeViews();
         setupRecyclerView();
         //fetchIngredients();
+
+        Button buyItemsButton = findViewById(R.id.buyItemsButton);
+        buyItemsButton.setOnClickListener(v -> buySelectedItems());
         fetchIngredients(new ShoppingListView.IngredientFetchCallback() {
             @Override
             public void onIngredientsFetched(List<ShoppingListModel> ingredients) {
@@ -72,6 +75,64 @@ public class ShoppingListView extends AppCompatActivity
             }
         });
     }
+
+    private void buySelectedItems() {
+        for (int i = adapter.getItemCount() - 1; i >= 0; i--) {
+            com.example.greenplate.views.ShoppingListAdapter.ShoppingListViewHolder holder = (com.example.greenplate.views.ShoppingListAdapter.ShoppingListViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+            if (holder != null && holder.isChecked()) {
+                String itemName = holder.getItemName();
+                String itemQuantity = holder.getQuantity();
+                removeFromShoppingList(itemName);  // Implement this method
+                addToPantry(itemName, itemQuantity);// Optionally add to pantry here or update any other state
+                shoppingItemList.remove(i);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void removeFromShoppingList(String itemName) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
+        userRef.child(itemName).removeValue().addOnSuccessListener(aVoid -> {
+            Toast.makeText(ShoppingListView.this, itemName + " purchased and removed from list.", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private String stripUsername() {
+        String username = User.getInstance().getUsername();
+        if (username != null && !username.isEmpty()) {
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            //DatabaseReference userRef = root.child(sanitizedUsername);
+            return sanitizedUsername;
+        }
+        return null;
+    }
+
+    private void addToPantry(String itemName, String quantity) {
+        DatabaseReference pantryRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(stripUsername());
+
+        pantryRef.child(itemName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Ingredient exists, update quantity
+                    Integer existingQuantity = snapshot.child("quantity").getValue(Integer.class);
+                    Integer newQuantity = existingQuantity != null ? existingQuantity + Integer.parseInt(quantity) : Integer.parseInt(quantity);
+                    pantryRef.child(itemName).child("quantity").setValue(newQuantity);
+                } else {
+                    // Ingredient does not exist, add new entry
+                    Map<String, Object> ingredientData = new HashMap<>();
+                    ingredientData.put("quantity", quantity);
+                    pantryRef.child(itemName).setValue(ingredientData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ShoppingListView.this, "Failed to update pantry: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void fetchIngredients(ShoppingListView.IngredientFetchCallback callback) {
         String username = User.getInstance().getUsername();

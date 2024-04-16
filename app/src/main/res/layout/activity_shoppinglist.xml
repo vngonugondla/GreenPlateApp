@@ -81,8 +81,15 @@
         android:id="@+id/scrollDownButton1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/bottomNavigationView"
+        android:layout_above="@id/buyItemsButton"
         android:text="Scroll Down" />
+
+    <Button
+        android:id="@+id/buyItemsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buy Items"
+        android:layout_above="@id/bottomNavigationView" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
