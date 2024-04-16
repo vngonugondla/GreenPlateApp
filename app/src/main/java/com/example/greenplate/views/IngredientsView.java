@@ -178,6 +178,18 @@ public class IngredientsView extends AppCompatActivity implements
                     Toast.LENGTH_SHORT).show();
             return;
         }
+        try {
+            double calorieValue = Double.parseDouble(calories);
+            if (calorieValue <= 0) {
+                Toast.makeText(IngredientsView.this, "Calories must be positive.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(IngredientsView.this, "Invalid calories entered.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         viewModel.checkIngredientExists(ingredientName, exists -> {
             if (exists) {
                 Toast.makeText(IngredientsView.this,
