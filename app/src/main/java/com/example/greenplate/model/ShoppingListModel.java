@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class ShoppingListModel {
     private String shoppingItemName;
-    private int quantity;
+    private String quantity;
 
     public ShoppingListModel() {
 
     }
-    public ShoppingListModel(String shoppingItemName, int quantity) {
+    public ShoppingListModel(String shoppingItemName, String quantity) {
         this.shoppingItemName = shoppingItemName;
         this.quantity = quantity;
     }
@@ -33,11 +33,11 @@ public class ShoppingListModel {
         this.shoppingItemName = shoppingItemName;
     }
 
-    public int getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 

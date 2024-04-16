@@ -17,12 +17,12 @@
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/ShoppingListItems"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Shopping List Items: "/>
-            <TextView
+                android:text="Shopping List Items: "/>-->
+            <CheckBox
                 android:id = "@+id/textShoppingListItems"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,6 +43,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize = "15sp"/>
+            <Button
+                android:id="@+id/increaseSLButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"/>
+
+            <Button
+                android:id="@+id/decreaseSLButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="-"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

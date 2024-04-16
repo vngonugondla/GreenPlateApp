@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
-import com.example.greenplate.model.IngredientsModel;
+import com.example.greenplate.model.ShoppingListModel;
 import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.ShoppingListViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,8 +47,8 @@ public class ShoppingListView extends AppCompatActivity
 
     private DatabaseReference root;
     private RecyclerView recyclerView;
-    private IngredientsAdapter adapter;
-    private ArrayList<IngredientsModel> ingredientList = new ArrayList<>();
+    private com.example.greenplate.views.ShoppingListAdapter adapter;
+    private ArrayList<ShoppingListModel> shoppingItemList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +60,9 @@ public class ShoppingListView extends AppCompatActivity
         //fetchIngredients();
         fetchIngredients(new ShoppingListView.IngredientFetchCallback() {
             @Override
-            public void onIngredientsFetched(List<IngredientsModel> ingredients) {
-                ingredientList.clear();
-                ingredientList.addAll(ingredients);
+            public void onIngredientsFetched(List<ShoppingListModel> ingredients) {
+                shoppingItemList.clear();
+                shoppingItemList.addAll(ingredients);
                 adapter.notifyDataSetChanged();
             }
 
@@ -82,7 +82,7 @@ public class ShoppingListView extends AppCompatActivity
             userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    List<IngredientsModel> fetchedIngredients = new ArrayList<>();
+                    List<ShoppingListModel> fetchedIngredients = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
                         String ingredientStr = snapshot.getKey();
@@ -110,8 +110,8 @@ public class ShoppingListView extends AppCompatActivity
                         String caloriesStr = snapshot.child("calories").getValue(String.class);
                         String expirationDateStr = snapshot.child("expirationDate")
                                 .getValue(String.class);
-                        IngredientsModel ingredient = new IngredientsModel(ingredientStr,
-                                quantityStr, caloriesStr, expirationDateStr);
+                        ShoppingListModel ingredient = new ShoppingListModel(ingredientStr,
+                               quantityStr);
                         if (ingredient != null) {
                             fetchedIngredients.add(ingredient);
                         }
@@ -175,10 +175,21 @@ public class ShoppingListView extends AppCompatActivity
                     Toast.LENGTH_SHORT).show();
             return;
         }
+        try {
+            double calorieValue = Double.parseDouble(calories);
+            if (calorieValue <= 0) {
+                Toast.makeText(ShoppingListView.this, "Calories must be positive.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(ShoppingListView.this, "Invalid calories entered.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         viewModel.checkIngredientExists(ingredientName, exists -> {
             if (exists) {
-                Toast.makeText(ShoppingListView.this,
-                        "Ingredient already exists in shopping list.", Toast.LENGTH_SHORT).show();
+                updateQuantityShoppingList(ingredientName, quantity);
             } else {
                 addIngredientToPantry(ingredientName, quantity, calories, expirationDate);
             }
@@ -249,15 +260,91 @@ public class ShoppingListView extends AppCompatActivity
         }
     }
 
+    private void updateQuantityShoppingList(String ingredientName, String quantityToAdd) {
+        // Parse quantityToAdd to an integer
+        int quantityToAddInt;
+        try {
+            quantityToAddInt = Integer.parseInt(quantityToAdd);
+        } catch (NumberFormatException e) {
+            // Handle the case where quantityToAdd is not a valid integer
+            Toast.makeText(ShoppingListView.this,
+                    "Invalid quantity format.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Retrieve the username (email) from the User singleton instance
+        String username = user.getUsername();
+        if (username != null && !username.isEmpty()) {
+            // Use only the part before the '@' symbol in the email as the key
+            // and remove any periods or other illegal characters
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]",
+                    "");
+
+            // Use the sanitized username to create a reference in your database
+            DatabaseReference userRef = root.child(sanitizedUsername);
+            DatabaseReference ingredientRef = userRef.child(ingredientName);
+
+            // Retrieve the current quantity from the database
+            ingredientRef.child("quantity").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        // Update the quantity by adding the new quantity to the existing one
+                        int existingQuantity = snapshot.getValue(Integer.class);
+                        int totalQuantity = existingQuantity + quantityToAddInt;
+
+                        // Update the quantity in the database
+                        ingredientRef.child("quantity").setValue(totalQuantity)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(ShoppingListView.this,
+                                                "Quantity updated in Shopping List.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(ShoppingListView.this,
+                                                "Failed to update quantity in shopping list: "
+                                                        + e.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    } else {
+                        // Handle the case where the quantity field doesn't exist
+                        Toast.makeText(ShoppingListView.this,
+                                "Quantity field doesn't exist for the ingredient.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(ShoppingListView.this,
+                            "Failed to retrieve quantity from the database: " + error.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(ShoppingListView.this,
+                    "Username not set", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.shopping_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new IngredientsAdapter(ingredientList, root);
+        adapter = new com.example.greenplate.views.ShoppingListAdapter(shoppingItemList, root);
         recyclerView.setAdapter(adapter);
     }
 
     public interface IngredientFetchCallback {
-        void onIngredientsFetched(List<IngredientsModel> ingredients);
+        void onIngredientsFetched(List<ShoppingListModel> ingredients);
         void onError(String message);
     }
 }
+
