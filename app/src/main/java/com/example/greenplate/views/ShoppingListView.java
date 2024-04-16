@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
-import com.example.greenplate.model.IngredientsModel;
+import com.example.greenplate.model.ShoppingListModel;
 import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.ShoppingListViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,8 +47,8 @@ public class ShoppingListView extends AppCompatActivity
 
     private DatabaseReference root;
     private RecyclerView recyclerView;
-    private IngredientsAdapter adapter;
-    private ArrayList<IngredientsModel> ingredientList = new ArrayList<>();
+    private ShoppingListAdapter adapter;
+    private ArrayList<ShoppingListModel> shoppingItemList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +60,9 @@ public class ShoppingListView extends AppCompatActivity
         //fetchIngredients();
         fetchIngredients(new ShoppingListView.IngredientFetchCallback() {
             @Override
-            public void onIngredientsFetched(List<IngredientsModel> ingredients) {
-                ingredientList.clear();
-                ingredientList.addAll(ingredients);
+            public void onIngredientsFetched(List<ShoppingListModel> ingredients) {
+                shoppingItemList.clear();
+                shoppingItemList.addAll(ingredients);
                 adapter.notifyDataSetChanged();
             }
 
@@ -82,7 +82,7 @@ public class ShoppingListView extends AppCompatActivity
             userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    List<IngredientsModel> fetchedIngredients = new ArrayList<>();
+                    List<ShoppingListModel> fetchedIngredients = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
                         String ingredientStr = snapshot.getKey();
@@ -110,8 +110,8 @@ public class ShoppingListView extends AppCompatActivity
                         String caloriesStr = snapshot.child("calories").getValue(String.class);
                         String expirationDateStr = snapshot.child("expirationDate")
                                 .getValue(String.class);
-                        IngredientsModel ingredient = new IngredientsModel(ingredientStr,
-                                quantityStr, caloriesStr, expirationDateStr);
+                        ShoppingListModel ingredient = new ShoppingListModel(ingredientStr,
+                               Integer.parseInt(quantityStr));
                         if (ingredient != null) {
                             fetchedIngredients.add(ingredient);
                         }
@@ -252,12 +252,13 @@ public class ShoppingListView extends AppCompatActivity
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.shopping_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new IngredientsAdapter(ingredientList, root);
+        adapter = new ShoppingListAdapter(shoppingItemList, root);
         recyclerView.setAdapter(adapter);
     }
 
     public interface IngredientFetchCallback {
-        void onIngredientsFetched(List<IngredientsModel> ingredients);
+        void onIngredientsFetched(List<ShoppingListModel> ingredients);
         void onError(String message);
     }
 }
+
