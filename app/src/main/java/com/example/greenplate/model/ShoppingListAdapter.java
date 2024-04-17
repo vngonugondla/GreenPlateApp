@@ -25,6 +25,7 @@ import java.util.List;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> {
 
+   //redone without ingredients adapter
    /* private Context context;
     private ArrayList<ShoppingListModel> list;
     private OnShoppingClickListener onShoppingClickListener;
