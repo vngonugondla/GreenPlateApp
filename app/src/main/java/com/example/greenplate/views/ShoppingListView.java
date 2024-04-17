@@ -150,8 +150,6 @@ public class ShoppingListView extends AppCompatActivity
         scrollDownButton.setOnClickListener(v -> recyclerView.scrollBy(0, 150));
 
     }
-
-
     private void handleSubmitButtonClick() {
         String ingredientName = ingredientNameEditText.getText().toString().trim();
         String quantity = quantityEditText.getText().toString().trim();
@@ -332,8 +330,6 @@ public class ShoppingListView extends AppCompatActivity
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.shopping_list);
