@@ -205,11 +205,6 @@ public class ShoppingListView extends AppCompatActivity
         viewModel = new ViewModelProvider(this).get(ShoppingListViewModel.class);
 
         submitButton.setOnClickListener(v -> handleSubmitButtonClick());
-        Button scrollUpButton = findViewById(R.id.scrollUpButton1);
-        Button scrollDownButton = findViewById(R.id.scrollDownButton1);
-        scrollUpButton.setOnClickListener(v -> recyclerView.scrollBy(0, -150));
-        scrollDownButton.setOnClickListener(v -> recyclerView.scrollBy(0, 150));
-
     }
 
 
