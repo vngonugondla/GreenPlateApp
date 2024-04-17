@@ -25,20 +25,6 @@ import java.util.List;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> {
 
-   //redone without ingredients adapter
-   /* private Context context;
-    private ArrayList<ShoppingListModel> list;
-    private OnShoppingClickListener onShoppingClickListener;
-
-
-    private DatabaseReference shoppingListRef;
-
-    public ShoppingListAdapter(ArrayList<ShoppingListModel> shoppingListItems, DatabaseReference reference
-                               ) {
-        this.list = shoppingListItems;
-        this.shoppingListRef = reference;
-    } */
-
     private List<ShoppingListModel> shoppingList;
 
     private User user = User.getInstance();
@@ -140,47 +126,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         public void setUserRef(DatabaseReference userRef) {
             this.userRef = userRef;
         }
-
-    /*
-    @NonNull
-    @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.shoppinglist_item,
-                parent, false);
-        return new MyViewHolder(v);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        ShoppingListModel shoppingListModel = list.get(position);
-        Log.d("ADAPTER", shoppingListModel.getShoppingItemName());
-        Log.d("ADAPTER", Integer.toString(shoppingListModel.getQuantity()));
-        holder.shoppingListItems.setText(shoppingListModel.getShoppingItemName());
-        holder.quantities.setText(Integer.toString(shoppingListModel.getQuantity()));
-    }
-
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        private CheckBox shoppingListItems;
-        private TextView quantities;
-
-        private Button increaseSLButton;
-        private Button decreaseSLButton;
-
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            shoppingListItems = itemView.findViewById(R.id.textShoppingListItems);
-            quantities = itemView.findViewById(R.id.textShoppingListQuantities);
-        }
-    }
-
-    public interface OnShoppingClickListener {
-        void onShoppingClick(ShoppingListModel shoppingListModel);
-    }*/
 
 
     }
