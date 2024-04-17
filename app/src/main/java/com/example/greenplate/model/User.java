@@ -18,6 +18,7 @@ public class User {
         this.gender = "";
     }
 
+    //getters and setters below
     public String getUsername() {
         return username;
     }
