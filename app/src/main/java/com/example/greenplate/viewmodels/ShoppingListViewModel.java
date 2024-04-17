@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ShoppingListViewModel extends ViewModel {
-    //private MutableLiveData<List<Ingredient>> ingredientsLiveData;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference root = db.getReference().child("ShoppingList");
     private User userInfo;
