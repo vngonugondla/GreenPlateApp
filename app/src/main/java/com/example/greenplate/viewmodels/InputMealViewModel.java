@@ -20,6 +20,7 @@ public class InputMealViewModel extends ViewModel {
         meal.setCalories(calories);
     }
 
+    //setter to set meal
     public void setInputMealModel(InputMealModel newMeal) {
         if (this.isValidInput(newMeal)) {
             meal.setMealName(newMeal.getMealName());
