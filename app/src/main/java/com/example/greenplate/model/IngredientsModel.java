@@ -13,6 +13,7 @@ public class IngredientsModel {
         this.calories = "";
     }
 
+    //Ingredients Model constructor with default expiration date
     public IngredientsModel(String ingredientName, String quantity, String calories) {
         this.ingredientName = ingredientName;
         this.quantity = quantity;
@@ -20,6 +21,7 @@ public class IngredientsModel {
         this.expirationDate = "00/00/0000";
     }
 
+    //Ingredients Model constructor with expiration date
     public IngredientsModel(String ingredientName, String quantity, String calories,
                             String expirationDate) {
         this.ingredientName = ingredientName;
