@@ -27,6 +27,8 @@ public class RecipeModel {
     private boolean hasEnoughIngredients;
     private ArrayList<IngredientsModel> ingredientsList;
 
+    private ArrayList<IngredientsModel> missingIngredients;
+
     public RecipeModel() {
 
     }
@@ -61,6 +63,14 @@ public class RecipeModel {
     }
     public ArrayList<IngredientsModel> getIngredientsList() {
         return ingredientsList;
+    }
+
+    public ArrayList<IngredientsModel> getMissingIngredients() {
+        return missingIngredients;
+    }
+
+    public void setMissingIngredients(ArrayList<IngredientsModel> missingIngredients) {
+        this.missingIngredients = missingIngredients;
     }
 
     public void setIngList(ArrayList<IngredientsModel> ingredientsList) {

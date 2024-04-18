@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,7 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         RecipeModel recipeModel = list.get(position);
         holder.recipeName.setText(recipeModel.getRecipeName());
+        holder.addToShoppingList.setVisibility(recipeModel.getHasEnoughIngredients() ? View.GONE: View.VISIBLE);
         holder.recipeName.setOnClickListener(view -> {
             if (recipeModel.getHasEnoughIngredients()) {
                 onRecipeClickListener.onRecipeClick(recipeModel);
@@ -67,6 +69,10 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
             holder.ingredientCheckmark.setVisibility(View.GONE);
 
         }
+
+        holder.addToShoppingList.setOnClickListener(view -> {
+
+        });
     }
     @Override
     public int getItemCount() {
@@ -78,6 +84,8 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
         private TextView ingredientCheckmark;
         private TextView ingredientCross;
 
+        private Button addToShoppingList;
+
         //viewholder for recipiescroll adapter
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,6 +93,7 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
             ingredients = itemView.findViewById(R.id.textingredients);
             ingredientCheckmark = itemView.findViewById(R.id.ingredientCheckmark);
             ingredientCross = itemView.findViewById(R.id.ingredientCross);
+            addToShoppingList = itemView.findViewById(R.id.addToShoppingList);
         }
     }
     public interface OnRecipeClickListener {
