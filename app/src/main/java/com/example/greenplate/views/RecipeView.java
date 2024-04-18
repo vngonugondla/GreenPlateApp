@@ -205,6 +205,7 @@ public class RecipeView extends AppCompatActivity
                     return;
                 }
                 for (RecipeModel recipe : list) {
+                    Log.d("RecipeView", "CURRENT RECIPE: " + recipe.getRecipeName());
                     ArrayList<IngredientsModel> ingredientsList = new ArrayList<>();
                     ArrayList<IngredientsModel> missingIngredients = new ArrayList<>();
                     boolean hasEnough = true;
@@ -214,6 +215,7 @@ public class RecipeView extends AppCompatActivity
                     } else {
                         for (Map.Entry<String, String> entry : ingredients.entrySet()) {
                             String ingredient = entry.getKey();
+                            Log.d("RecipeView", "CURRENT INGREDIENT: " + ingredient);
                             int requiredQuantity = Integer.parseInt(entry.getValue());
                             try {
                                 DataSnapshot pantryIngredientSnapshot = pantrySnapshot
@@ -224,9 +226,19 @@ public class RecipeView extends AppCompatActivity
                                         String ingredientName = entry1.getKey();
                                         int requiredAmount = Integer.parseInt(entry1.getValue());
                                         ingredientsList.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
-                                        Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
+                                        boolean inList = false;
+                                        for (IngredientsModel model: missingIngredients) {
+                                            if (model.getIngredientName() == ingredientName) {
+                                                inList = true;
+                                            }
+                                        }
+                                        if (!inList) {
+                                            missingIngredients.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
+                                            Log.d("RecipeView", "INGREDIENT NOT IN LIST: " + ingredientName + ", Quantity: " + requiredAmount);
+                                        }
+                                        //Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
                                     }
-                                    recipe.setMissingIngredients(ingredientsList);
+                                    recipe.setMissingIngredients(missingIngredients);
                                     break;
                                 } else {
                                     Object pantryQuantityObj = pantryIngredientSnapshot
@@ -256,6 +268,7 @@ public class RecipeView extends AppCompatActivity
 
                                     if (pantryQuantity < requiredQuantity) {
                                         missingIngredients.add(new IngredientsModel(ingredient, String.valueOf(requiredQuantity - pantryQuantity), String.valueOf(pantryCalories), pantryExpiry));
+                                        Log.d("RecipeView", "NOT ENOUGH: " + ingredient);
                                         hasEnough = false;
                                     }
                                 }
