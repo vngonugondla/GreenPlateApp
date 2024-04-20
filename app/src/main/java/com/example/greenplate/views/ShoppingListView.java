@@ -103,13 +103,26 @@ public class ShoppingListView extends AppCompatActivity
                             //Toast.makeText(ShoppingListView.this,
                              //       "Ingredient already exists in pantry.", Toast.LENGTH_SHORT).show();
                         } else {
-                            addIngredientToPantry(itemName, itemQuantity, "0", "00/00/0000");
+                            //addIngredientToPantry(itemName, itemQuantity, "0", "00/00/0000");
+                            addIngredientToPantry2(itemName, itemQuantity, "0", "00/00/0000", new PantryUpdateCallback() {
+                                @Override
+                                public void onUpdateCompleted(boolean success) {
+                                    if (success) {
+                                        // Handle successful addition
+                                        // Maybe refresh the list or update UI
+                                    } else {
+                                        // Handle failure
+                                        // Show error message or log the issue
+                                    }
+                                }
+                            });
                         }
                     });
                 } else {
                     Toast.makeText(this, "ViewModel is not initialized", Toast.LENGTH_SHORT).show();
                 }
-                removeFromShoppingList(itemName);  // Implement this method
+                //removeFromShoppingList(itemName);  // Implement this method
+                handleShoppingListRemoval(itemName, i);
                 //addToPantry(itemName, itemQuantity);// Optionally add to pantry here or update any other state
                 shoppingItemList.remove(i);
             }
@@ -117,12 +130,41 @@ public class ShoppingListView extends AppCompatActivity
         adapter.notifyDataSetChanged();
     }
 
-    private void removeFromShoppingList(String itemName) {
+   /* private void removeFromShoppingList(String itemName) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
         userRef.child(itemName).removeValue().addOnSuccessListener(aVoid -> {
             Toast.makeText(ShoppingListView.this, itemName + " purchased and removed from list.", Toast.LENGTH_SHORT).show();
         });
+    }*/
+   private void handleShoppingListRemoval(String itemName, int position) {
+       removeFromShoppingList(itemName, success -> {
+           if (success) {
+               // Remove the item from the local data model as well
+               shoppingItemList.remove(position);
+               adapter.notifyItemRemoved(position);
+               Toast.makeText(ShoppingListView.this, itemName + " successfully removed.", Toast.LENGTH_SHORT).show();
+           } else {
+               Toast.makeText(ShoppingListView.this, "Error removing " + itemName + " from list.", Toast.LENGTH_SHORT).show();
+           }
+       });
+   }
+
+
+    public interface ShoppingListUpdateCallback {
+        void onCompleted(boolean success);
     }
+
+    private void removeFromShoppingList(String itemName, ShoppingListUpdateCallback callback) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
+        userRef.child(itemName).removeValue().addOnSuccessListener(aVoid -> {
+            Toast.makeText(ShoppingListView.this, itemName + " purchased and removed from list.", Toast.LENGTH_SHORT).show();
+            callback.onCompleted(true);  // Notify callback of success
+        }).addOnFailureListener(e -> {
+            Toast.makeText(ShoppingListView.this, "Failed to remove " + itemName + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            callback.onCompleted(false);  // Notify callback of failure
+        });
+    }
+
 
     private void updatePantryQuantity(String ingredientName, String quantityToAdd, IngredientCheckCallback callback) {
         int quantityToAddInt;
@@ -180,57 +222,43 @@ public class ShoppingListView extends AppCompatActivity
     }
 
 
-    /*private void duplicateHandler(String ingredientName, String quantityToAdd, IngredientCheckCallback callback) {
-        // Parse quantityToAdd to an integer
-        int quantityToAddInt;
-        try {
-            quantityToAddInt = Integer.parseInt(quantityToAdd);
-        } catch (NumberFormatException e) {
-            // Handle the case where quantityToAdd is not a valid integer
-            Toast.makeText(ShoppingListView.this,
-                    "Invalid quantity format.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
-        DatabaseReference ingredientRef = userRef.child(ingredientName);
-
-        ingredientRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Object quantityObj = snapshot.child("quantity").getValue();
-                    Double quantity = null;
-                    if (quantityObj instanceof Long) {
-                        quantity = ((Long) quantityObj).doubleValue();
-                    } else if (quantityObj instanceof String) {
-                        try {
-                            quantity = Double.parseDouble((String) quantityObj);
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-                    if (quantity != null && quantity > 0) {
-                        callback.onCheckCompleted(true);
-                    } else {
-                        callback.onCheckCompleted(false);
-                    }
-                } else {
-                    callback.onCheckCompleted(false);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //Handle error - might want to call callback with false or specific
-                callback.onCheckCompleted(false);
-            }
-        });
-    }*/
-
-
-
     public interface IngredientCheckCallback {
         void onCheckCompleted(boolean exists);
     }
+
+    public interface PantryUpdateCallback {
+        void onUpdateCompleted(boolean success);
+    }
+
+    public void addIngredientToPantry2(String ingredientName, String quantity, String calories, String expirationDate, PantryUpdateCallback callback) {
+        String username = user.getUsername();
+        if (username != null && !username.isEmpty()) {
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(stripUsername());
+            DatabaseReference ingredientRef = userRef.child(ingredientName);
+
+            Map<String, Object> ingredientData = new HashMap<>();
+            ingredientData.put("quantity", quantity);
+            ingredientData.put("calories", calories);
+            ingredientData.put("expirationDate", expirationDate);
+
+            ingredientRef.setValue(ingredientData)
+                    .addOnSuccessListener(unused -> {
+                        Toast.makeText(ShoppingListView.this, "Ingredient added to Pantry.", Toast.LENGTH_SHORT).show();
+                        callback.onUpdateCompleted(true);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(ShoppingListView.this, "Failed to add ingredient to pantry: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        callback.onUpdateCompleted(false);
+                    });
+        } else {
+            Toast.makeText(ShoppingListView.this, "Username not set", Toast.LENGTH_SHORT).show();
+            callback.onUpdateCompleted(false);  // Notify callback of failure due to missing username
+        }
+    }
+
+
+
 
     private String stripUsername() {
         String username = User.getInstance().getUsername();
