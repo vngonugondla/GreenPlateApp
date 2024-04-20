@@ -73,6 +73,7 @@ public class ShoppingListView extends AppCompatActivity
         });
     }
 
+    //fetches ingredients for the shopping list or returns error message
     private void fetchIngredients(ShoppingListView.IngredientFetchCallback callback) {
         String username = User.getInstance().getUsername();
         if (username != null && !username.isEmpty()) {

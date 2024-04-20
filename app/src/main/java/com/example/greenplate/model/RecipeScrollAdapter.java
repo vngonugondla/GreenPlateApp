@@ -37,6 +37,7 @@ public class RecipeScrollAdapter extends RecyclerView.Adapter<RecipeScrollAdapte
         return new MyViewHolder(v);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         RecipeModel recipeModel = list.get(position);
