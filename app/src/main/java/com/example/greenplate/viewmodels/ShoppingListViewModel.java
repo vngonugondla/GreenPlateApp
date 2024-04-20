@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
 import com.example.greenplate.model.IngredientsModel;
+import com.example.greenplate.model.InputMealModel;
+import com.example.greenplate.model.ShoppingListModel;
 import com.example.greenplate.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,11 +22,13 @@ public class ShoppingListViewModel extends ViewModel {
     private DatabaseReference root = db.getReference().child("ShoppingList");
     private User userInfo;
 
-    private boolean isNameValid(String name) {
+    private ShoppingListModel model;
+
+    public boolean isNameValid(String name) {
         return name != null && !name.trim().isEmpty();
     }
 
-    private boolean isCaloriesValid(String calories) {
+    public boolean isCaloriesValid(String calories) {
         try {
             int cal = Integer.parseInt(calories);
             return cal >= 0;
@@ -38,7 +42,7 @@ public class ShoppingListViewModel extends ViewModel {
                 && isExpirationDateValid(ingredient.getExpirationDate());
     }
 
-    private boolean isExpirationDateValid(String expirationDate) {
+    public boolean isExpirationDateValid(String expirationDate) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         sdf.setLenient(false); // Don't allow dates like 02/30/2020
         try {
@@ -101,6 +105,11 @@ public class ShoppingListViewModel extends ViewModel {
         }
 
 
+    }
+
+    public void setShoppingViewModel(ShoppingListModel newShopping) {
+        model.setShoppingItemName(newShopping.getShoppingItemName());
+        model.setQuantity(newShopping.getQuantity());
     }
 
     public ShoppingListViewModel() {
