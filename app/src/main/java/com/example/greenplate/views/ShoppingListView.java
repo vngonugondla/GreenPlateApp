@@ -2,6 +2,7 @@ package com.example.greenplate.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
 import com.example.greenplate.model.ShoppingListModel;
+import com.example.greenplate.views.ShoppingListAdapter;
 import com.example.greenplate.model.User;
 import com.example.greenplate.viewmodels.IngredientsViewModel;
 import com.example.greenplate.viewmodels.ShoppingListViewModel;
@@ -27,7 +29,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class ShoppingListView extends AppCompatActivity
 
     private DatabaseReference root;
     private RecyclerView recyclerView;
-    private com.example.greenplate.views.ShoppingListAdapter adapter;
+    private ShoppingListAdapter adapter;
     private ArrayList<ShoppingListModel> shoppingItemList = new ArrayList<>();
 
     @Override
@@ -139,15 +140,22 @@ public class ShoppingListView extends AppCompatActivity
    private void handleShoppingListRemoval(String itemName, int position) {
        removeFromShoppingList(itemName, success -> {
            if (success) {
-               // Remove the item from the local data model as well
-               shoppingItemList.remove(position);
-               adapter.notifyItemRemoved(position);
-               Toast.makeText(ShoppingListView.this, itemName + " successfully removed.", Toast.LENGTH_SHORT).show();
+               // Synchronize access to shoppingItemList if it might be accessed from multiple threads
+               synchronized (shoppingItemList) {
+                   // Check if the position is still valid
+                   if (position < shoppingItemList.size()) {
+                       // Remove the item from the local data model as well
+                       shoppingItemList.remove(position);
+                       adapter.notifyItemRemoved(position);
+                       runOnUiThread(() -> Toast.makeText(ShoppingListView.this, itemName + " successfully removed.", Toast.LENGTH_SHORT).show());
+                   }
+               }
            } else {
-               Toast.makeText(ShoppingListView.this, "Error removing " + itemName + " from list.", Toast.LENGTH_SHORT).show();
+               runOnUiThread(() -> Toast.makeText(ShoppingListView.this, "Error removing " + itemName + " from list.", Toast.LENGTH_SHORT).show());
            }
        });
    }
+
 
 
     public interface ShoppingListUpdateCallback {
@@ -281,36 +289,18 @@ public class ShoppingListView extends AppCompatActivity
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     List<ShoppingListModel> fetchedIngredients = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
-                        String ingredientStr = snapshot.getKey();
-                        String quantityStr;
-                        Object quantityObj = snapshot.child("quantity").getValue();
-                        if (quantityObj instanceof Long || quantityObj instanceof Integer) {
-                            quantityStr = String.valueOf(quantityObj);
-                        } else if (quantityObj instanceof String) {
-                            // Here, you can directly use the string or attempt to parse it as
-                            // a long if necessary
-                            quantityStr = (String) quantityObj;
-                            try {
-                                long quantityLong = Long.parseLong(quantityStr);
-                                // If parsing is successful but you still need it as a string
-                                quantityStr = String.valueOf(quantityLong);
-                            } catch (NumberFormatException e) {
-                                // Handle the case where the string cannot be parsed to a long
-                                quantityStr = "Invalid Format"; // Adjust based on how you want
-                                // to handle this
-                            }
-                        } else {
-                            quantityStr = "Unknown Quantity"; // Adjust accordingly
-                        }
+                        try {
+                            String ingredientName = snapshot.getKey();
+                            String quantityStr = convertQuantity(snapshot.child("quantity").getValue());
+                            String caloriesStr = snapshot.child("calories").getValue(String.class);
+                            String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
 
-                        String caloriesStr = snapshot.child("calories").getValue(String.class);
-                        String expirationDateStr = snapshot.child("expirationDate")
-                                .getValue(String.class);
-                        ShoppingListModel ingredient = new ShoppingListModel(ingredientStr,
-                               quantityStr);
-                        if (ingredient != null) {
+                            ShoppingListModel ingredient = new ShoppingListModel(ingredientName, quantityStr, caloriesStr, expirationDateStr);
                             fetchedIngredients.add(ingredient);
+                        } catch (Exception e) {
+                            Log.e("ShoppingListView", "Error parsing ingredient data", e);
+                            callback.onError("Error parsing data for " + snapshot.getKey());
+                            return;
                         }
                     }
                     callback.onIngredientsFetched(fetchedIngredients);
@@ -318,12 +308,28 @@ public class ShoppingListView extends AppCompatActivity
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("ShoppingListView", "Database error: " + databaseError.getMessage());
                     callback.onError("Failed to load ingredients.");
                 }
             });
         } else {
             callback.onError("Username not set or invalid.");
         }
+    }
+
+    private String convertQuantity(Object quantityObj) {
+        if (quantityObj instanceof Long || quantityObj instanceof Integer) {
+            return String.valueOf(quantityObj);
+        } else if (quantityObj instanceof String) {
+            try {
+                // Convert to integer first to remove any decimals
+                return String.valueOf(Integer.parseInt((String) quantityObj));
+            } catch (NumberFormatException e) {
+                Log.e("ShoppingListView", "Failed to parse quantity: " + quantityObj, e);
+                return "Invalid Format";
+            }
+        }
+        return "Unknown";
     }
 
     private void initializeViews() {

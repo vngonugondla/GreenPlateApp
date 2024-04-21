@@ -1,7 +1,5 @@
 package com.example.greenplate.views;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
 import com.example.greenplate.model.ShoppingListModel;
-import com.example.greenplate.R;
-import com.example.greenplate.model.IngredientsModel;
 import com.example.greenplate.model.User;
 import com.google.firebase.database.DatabaseReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> {

@@ -8,9 +8,7 @@ public class IngredientsModel {
     private String expirationDate;
 
     public IngredientsModel() {
-        this.ingredientName = "";
-        this.quantity = "";
-        this.calories = "";
+
     }
 
     public IngredientsModel(String ingredientName, String quantity, String calories) {
