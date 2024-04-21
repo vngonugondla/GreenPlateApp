@@ -8,10 +8,19 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="testValidIngredient()">
+      <entry key="testShoppingList6()">
+        <State />
+      </entry>
+      <entry key="testShoppingListName()">
+        <State />
+      </entry>
+      <entry key="testShoppinglist2()">
         <State />
       </entry>
       <entry key="testValidShoppingList()">
+        <State />
+      </entry>
+      <entry key="testValidShoppingList1()">
         <State />
       </entry>
     </value>

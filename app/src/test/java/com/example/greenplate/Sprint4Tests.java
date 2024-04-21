@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import com.example.greenplate.model.IngredientsModel;
 import com.example.greenplate.model.RecipeModel;
 import com.example.greenplate.model.ShoppingListModel;
+import com.example.greenplate.viewmodels.IngredientsViewModel;
 import com.example.greenplate.viewmodels.ShoppingListViewModel;
 
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class Sprint4Tests {
     private ShoppingListModel model;
@@ -28,6 +30,14 @@ public class Sprint4Tests {
         assertEquals("10",shop.getQuantity());
     }
     @Test
+    public void shoppingListTest1() {
+        ShoppingListModel shop = new ShoppingListModel("Pepper", "1");
+        shop.setShoppingItemName("Salt");
+        assertEquals("Salt", shop.getShoppingItemName());
+        shop.setQuantity("20");
+        assertEquals("20",shop.getQuantity());
+    }
+    @Test
     public void ingredientModelIntialization() {
         IngredientsModel ingredient = new IngredientsModel();
         assertEquals("", ingredient.getIngredientName());
@@ -39,6 +49,7 @@ public class Sprint4Tests {
         assertEquals("100", ingredient2.getCalories());
         assertEquals("04/19/2024", ingredient2.getExpirationDate());
     }
+
 
 
 }
