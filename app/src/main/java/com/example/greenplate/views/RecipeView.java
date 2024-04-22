@@ -226,20 +226,22 @@ public class RecipeView extends AppCompatActivity
                                         String ingredientName = entry1.getKey();
                                         int requiredAmount = Integer.parseInt(entry1.getValue());
                                         ingredientsList.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
-                                        boolean inList = false;
-                                        for (IngredientsModel model: missingIngredients) {
-                                            if (model.getIngredientName() == ingredientName) {
-                                                inList = true;
-                                            }
-                                        }
-                                        if (!inList) {
-                                            missingIngredients.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
-                                            Log.d("RecipeView", "INGREDIENT NOT IN LIST: " + ingredientName + ", Quantity: " + requiredAmount);
-                                        }
                                         //Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
                                     }
+
+                                    boolean inList = false;
+                                    for (IngredientsModel model: missingIngredients) {
+                                        if (model.getIngredientName() == ingredient) {
+                                            inList = true;
+                                        }
+                                    }
+                                    if (!inList) {
+                                        missingIngredients.add(new IngredientsModel(ingredient, String.valueOf(requiredQuantity), "0", "MM/DD/YYYY"));
+                                        Log.d("RecipeView", "INGREDIENT NOT IN LIST: " + ingredient + ", Quantity: " + String.valueOf(requiredQuantity));
+                                    }
+
                                     recipe.setMissingIngredients(missingIngredients);
-                                    break;
+                                    //break;
                                 } else {
                                     Object pantryQuantityObj = pantryIngredientSnapshot
                                             .child("quantity").getValue();
