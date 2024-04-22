@@ -31,7 +31,7 @@ public class Sprint4ShoppingTest {
 
     @Test
     public void testShoppingListName() {
-        ShoppingListModel validShoppingList = new ShoppingListModel("Tomato", "10");
+        ShoppingListModel validShoppingList = new ShoppingListModel("Tomato", "10","","");
         assertTrue("Valid ingredient should be considered valid", viewModel.isNameValid(validShoppingList.getShoppingItemName()));
         validShoppingList.setShoppingItemName("");
         assertFalse(viewModel.isNameValid(validShoppingList.getShoppingItemName()));
@@ -40,7 +40,7 @@ public class Sprint4ShoppingTest {
     }
     @Test
     public void testValidShoppingList2() {
-        ShoppingListModel validShoppingList = new ShoppingListModel("Bread", "20");
+        ShoppingListModel validShoppingList = new ShoppingListModel("Bread", "20","","");
         validShoppingList.setQuantity("50");
         assertEquals("50", validShoppingList.getQuantity());
     }
@@ -54,18 +54,18 @@ public class Sprint4ShoppingTest {
 
     @Test
     public void testShoppingList4() {
-        ShoppingListModel shop = new ShoppingListModel("Pepper", "100");
+        ShoppingListModel shop = new ShoppingListModel("Pepper", "100","","");
         viewModel.isNameValid(shop.getShoppingItemName());
     }
 
     @Test
     public void testShoppingList5() {
-        ShoppingListModel shop = new ShoppingListModel("Pepper", "100");
+        ShoppingListModel shop = new ShoppingListModel("Pepper", "100","","");
         viewModel.isNameValid(shop.getShoppingItemName());
     }
     @Test
     public void testShoppingList6() {
-        ShoppingListModel shop2 = new ShoppingListModel("Water", "10");
+        ShoppingListModel shop2 = new ShoppingListModel("Water", "10","","");
         viewModel.isValidIngredient(new IngredientsModel(shop2.getShoppingItemName(), shop2.getQuantity(), "100","04/21/2024"));
     }
 
