@@ -8,6 +8,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
 import com.example.greenplate.R;
 
@@ -15,11 +20,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
+
 public class RecipeModel {
     private String recipeName;
     private Map<String, String> ingredients;
     private boolean hasEnoughIngredients;
     private ArrayList<IngredientsModel> ingredientsList;
+
+    private ArrayList<IngredientsModel> missingIngredients;
 
     public RecipeModel() {
 
@@ -57,6 +65,14 @@ public class RecipeModel {
         return ingredientsList;
     }
 
+    public ArrayList<IngredientsModel> getMissingIngredients() {
+        return missingIngredients;
+    }
+
+    public void setMissingIngredients(ArrayList<IngredientsModel> missingIngredients) {
+        this.missingIngredients = missingIngredients;
+    }
+
     public void setIngList(ArrayList<IngredientsModel> ingredientsList) {
         this.ingredientsList = ingredientsList;
     }
@@ -70,6 +86,37 @@ public class RecipeModel {
             }
         }
         return true;
+    }
+
+    public void calculateTotalCalories(DatabaseReference pantryRef, OnCaloriesCalculatedListener listener) {
+        final int[] totalCalories = {0};
+        final int[] pendingRequests = {ingredients.size()}; // Counter to track pending Firebase requests.
+
+        for (String ingredientName : this.ingredients.keySet()) {
+            pantryRef.child(ingredientName).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        IngredientsModel ingredient = dataSnapshot.getValue(IngredientsModel.class);
+                        int requiredQuantity = Integer.parseInt(ingredients.get(ingredientName));
+                        totalCalories[0] += Integer.parseInt(ingredient.getCalories()) * requiredQuantity;
+                    }
+                    if (--pendingRequests[0] == 0) {
+                        listener.onCalculated(totalCalories[0]);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle errors
+                }
+            });
+        }
+    }
+
+    // listener interface used for the callback when calorie calculation is complete
+    public interface OnCaloriesCalculatedListener {
+        void onCalculated(int calories);
     }
 
 }

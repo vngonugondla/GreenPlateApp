@@ -205,7 +205,9 @@ public class RecipeView extends AppCompatActivity
                     return;
                 }
                 for (RecipeModel recipe : list) {
+                    Log.d("RecipeView", "CURRENT RECIPE: " + recipe.getRecipeName());
                     ArrayList<IngredientsModel> ingredientsList = new ArrayList<>();
+                    ArrayList<IngredientsModel> missingIngredients = new ArrayList<>();
                     boolean hasEnough = true;
                     Map<String, String> ingredients = recipe.getIngredients();
                     if (ingredients == null) {
@@ -213,6 +215,7 @@ public class RecipeView extends AppCompatActivity
                     } else {
                         for (Map.Entry<String, String> entry : ingredients.entrySet()) {
                             String ingredient = entry.getKey();
+                            Log.d("RecipeView", "CURRENT INGREDIENT: " + ingredient);
                             int requiredQuantity = Integer.parseInt(entry.getValue());
                             try {
                                 DataSnapshot pantryIngredientSnapshot = pantrySnapshot
@@ -223,9 +226,22 @@ public class RecipeView extends AppCompatActivity
                                         String ingredientName = entry1.getKey();
                                         int requiredAmount = Integer.parseInt(entry1.getValue());
                                         ingredientsList.add(new IngredientsModel(ingredientName, String.valueOf(requiredAmount), "0", "MM/DD/YYYY"));
-                                        Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
+                                        //Log.d("RecipeView", "Added Ingredient - Name: " + ingredientName + ", Quantity: " + requiredAmount);
                                     }
-                                    break;
+
+                                    boolean inList = false;
+                                    for (IngredientsModel model: missingIngredients) {
+                                        if (model.getIngredientName() == ingredient) {
+                                            inList = true;
+                                        }
+                                    }
+                                    if (!inList) {
+                                        missingIngredients.add(new IngredientsModel(ingredient, String.valueOf(requiredQuantity), "0", "MM/DD/YYYY"));
+                                        Log.d("RecipeView", "INGREDIENT NOT IN LIST: " + ingredient + ", Quantity: " + String.valueOf(requiredQuantity));
+                                    }
+
+                                    recipe.setMissingIngredients(missingIngredients);
+                                    //break;
                                 } else {
                                     Object pantryQuantityObj = pantryIngredientSnapshot
                                             .child("quantity").getValue();
@@ -239,9 +255,7 @@ public class RecipeView extends AppCompatActivity
                                     } else {
                                         hasEnough = false;
                                     }
-                                    if (pantryQuantity < requiredQuantity) {
-                                        hasEnough = false;
-                                    }
+
                                     int pantryCalories = 0;
                                     if (pantryCaloriesObj instanceof Long) {
                                         pantryCalories = ((Long) pantryCaloriesObj).intValue();
@@ -253,6 +267,12 @@ public class RecipeView extends AppCompatActivity
                                     String pantryExpiry = pantryExpirationDateObj.toString();
                                     ingredientsList.add(new IngredientsModel(ingredient, String.valueOf(pantryQuantity), String.valueOf(pantryCalories), pantryExpiry));
                                     Log.d("RecipeView", "Added Ingredient - Name: " + ingredient + ", Quantity: " + pantryQuantity + ", Calories: " + pantryCalories + ", Expiry: " + pantryExpiry);
+
+                                    if (pantryQuantity < requiredQuantity) {
+                                        missingIngredients.add(new IngredientsModel(ingredient, String.valueOf(requiredQuantity - pantryQuantity), String.valueOf(pantryCalories), pantryExpiry));
+                                        Log.d("RecipeView", "NOT ENOUGH: " + ingredient);
+                                        hasEnough = false;
+                                    }
                                 }
 
                             } catch (NumberFormatException e) {
@@ -261,6 +281,7 @@ public class RecipeView extends AppCompatActivity
                             }
 
                         }
+                        recipe.setMissingIngredients(missingIngredients);
                     }
                     Log.d("RecipeView", "Final Ingredients List for Recipe '" + recipe.getRecipeName() + "': " + ingredientsList.stream()
                             .map(ingredient -> ingredient.getIngredientName() + " - Qty: " + ingredient.getQuantity() + ", Cal: " + ingredient.getCalories() + ", Exp: " + ingredient.getExpirationDate())

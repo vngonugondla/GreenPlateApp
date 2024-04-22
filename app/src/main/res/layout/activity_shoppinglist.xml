@@ -67,22 +67,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/submit_button"
-        android:layout_above="@id/scrollUpButton1"
-        android:layout_marginTop="8dp" />
-
-    <Button
-        android:id="@+id/scrollUpButton1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/scrollDownButton1"
-        android:text="Scroll Up" />
-
-    <Button
-        android:id="@+id/scrollDownButton1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_above="@id/bottomNavigationView"
-        android:text="Scroll Down" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+
+    <Button
+        android:id="@+id/buyItemsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buy Items"
+        android:layout_above="@id/bottomNavigationView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

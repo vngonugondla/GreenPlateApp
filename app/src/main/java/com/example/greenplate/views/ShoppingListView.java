@@ -2,6 +2,7 @@ package com.example.greenplate.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenplate.R;
 import com.example.greenplate.model.ShoppingListModel;
+import com.example.greenplate.views.ShoppingListAdapter;
 import com.example.greenplate.model.User;
+import com.example.greenplate.viewmodels.IngredientsViewModel;
 import com.example.greenplate.viewmodels.ShoppingListViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,7 +29,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +46,11 @@ public class ShoppingListView extends AppCompatActivity
 
     private FirebaseDatabase db;
     private ShoppingListViewModel viewModel;
+    private IngredientsViewModel viewModelIng;
 
     private DatabaseReference root;
     private RecyclerView recyclerView;
-    private com.example.greenplate.views.ShoppingListAdapter adapter;
+    private ShoppingListAdapter adapter;
     private ArrayList<ShoppingListModel> shoppingItemList = new ArrayList<>();
 
     @Override
@@ -58,6 +61,11 @@ public class ShoppingListView extends AppCompatActivity
         initializeViews();
         setupRecyclerView();
         //fetchIngredients();
+
+        viewModelIng = new ViewModelProvider(this).get(IngredientsViewModel.class);
+
+        Button buyItemsButton = findViewById(R.id.buyItemsButton);
+        buyItemsButton.setOnClickListener(v -> buySelectedItems());
         fetchIngredients(new ShoppingListView.IngredientFetchCallback() {
             @Override
             public void onIngredientsFetched(List<ShoppingListModel> ingredients) {
@@ -73,7 +81,203 @@ public class ShoppingListView extends AppCompatActivity
         });
     }
 
-    //fetches ingredients for the shopping list or returns error message
+
+    private void buySelectedItems() {
+        for (int i = adapter.getItemCount() - 1; i >= 0; i--) {
+            com.example.greenplate.views.ShoppingListAdapter.ShoppingListViewHolder holder = (com.example.greenplate.views.ShoppingListAdapter.ShoppingListViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+            if (holder != null && holder.isChecked()) {
+                String itemName = holder.getItemName();
+                String itemQuantity = holder.getQuantity();
+                if (viewModelIng != null) {
+                    viewModelIng.checkIngredientExists(itemName, exists -> {
+                        if (exists) {
+                            updatePantryQuantity(itemName, itemQuantity, new IngredientCheckCallback() {
+                                @Override
+                                public void onCheckCompleted(boolean success) {
+                                    if (success) {
+                                        Toast.makeText(ShoppingListView.this, itemName + " updated in pantry.", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(ShoppingListView.this, "Failed to update " + itemName + " in pantry.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            //Toast.makeText(ShoppingListView.this,
+                             //       "Ingredient already exists in pantry.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            //addIngredientToPantry(itemName, itemQuantity, "0", "00/00/0000");
+                            addIngredientToPantry2(itemName, itemQuantity, "0", "00/00/0000", new PantryUpdateCallback() {
+                                @Override
+                                public void onUpdateCompleted(boolean success) {
+                                    if (success) {
+                                        // Handle successful addition
+                                        // Maybe refresh the list or update UI
+                                    } else {
+                                        // Handle failure
+                                        // Show error message or log the issue
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, "ViewModel is not initialized", Toast.LENGTH_SHORT).show();
+                }
+                //removeFromShoppingList(itemName);  // Implement this method
+                handleShoppingListRemoval(itemName, i);
+                //addToPantry(itemName, itemQuantity);// Optionally add to pantry here or update any other state
+                shoppingItemList.remove(i);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+   /* private void removeFromShoppingList(String itemName) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
+        userRef.child(itemName).removeValue().addOnSuccessListener(aVoid -> {
+            Toast.makeText(ShoppingListView.this, itemName + " purchased and removed from list.", Toast.LENGTH_SHORT).show();
+        });
+    }*/
+   private void handleShoppingListRemoval(String itemName, int position) {
+       removeFromShoppingList(itemName, success -> {
+           if (success) {
+               // Synchronize access to shoppingItemList if it might be accessed from multiple threads
+               synchronized (shoppingItemList) {
+                   // Check if the position is still valid
+                   if (position < shoppingItemList.size()) {
+                       // Remove the item from the local data model as well
+                       shoppingItemList.remove(position);
+                       adapter.notifyItemRemoved(position);
+                       runOnUiThread(() -> Toast.makeText(ShoppingListView.this, itemName + " successfully removed.", Toast.LENGTH_SHORT).show());
+                   }
+               }
+           } else {
+               runOnUiThread(() -> Toast.makeText(ShoppingListView.this, "Error removing " + itemName + " from list.", Toast.LENGTH_SHORT).show());
+           }
+       });
+   }
+
+
+
+    public interface ShoppingListUpdateCallback {
+        void onCompleted(boolean success);
+    }
+
+    private void removeFromShoppingList(String itemName, ShoppingListUpdateCallback callback) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("ShoppingList").child(stripUsername());
+        userRef.child(itemName).removeValue().addOnSuccessListener(aVoid -> {
+            Toast.makeText(ShoppingListView.this, itemName + " purchased and removed from list.", Toast.LENGTH_SHORT).show();
+            callback.onCompleted(true);  // Notify callback of success
+        }).addOnFailureListener(e -> {
+            Toast.makeText(ShoppingListView.this, "Failed to remove " + itemName + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            callback.onCompleted(false);  // Notify callback of failure
+        });
+    }
+
+
+    private void updatePantryQuantity(String ingredientName, String quantityToAdd, IngredientCheckCallback callback) {
+        int quantityToAddInt;
+        try {
+            quantityToAddInt = Integer.parseInt(quantityToAdd);
+        } catch (NumberFormatException e) {
+            Toast.makeText(ShoppingListView.this, "Invalid quantity format.", Toast.LENGTH_SHORT).show();
+            callback.onCheckCompleted(false);  // Notify callback of failure due to format issues
+            return;
+        }
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(stripUsername());
+        DatabaseReference ingredientRef = userRef.child(ingredientName);
+
+        ingredientRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Double currentQuantity = 0.0;  // Default current quantity to zero if not present
+                if (snapshot.exists() && snapshot.child("quantity").getValue() != null) {
+                    Object quantityObj = snapshot.child("quantity").getValue();
+                    if (quantityObj instanceof Long) {
+                        currentQuantity = ((Long) quantityObj).doubleValue();
+                    } else if (quantityObj instanceof String) {
+                        try {
+                            currentQuantity = Double.parseDouble((String) quantityObj);
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(ShoppingListView.this, "Error parsing existing quantity.", Toast.LENGTH_SHORT).show();
+                            callback.onCheckCompleted(false);
+                            return;
+                        }
+                    }
+                }
+
+                // Calculate the new total quantity
+                double newQuantity = currentQuantity + quantityToAddInt;
+
+                // Update the quantity in the database
+                ingredientRef.child("quantity").setValue(newQuantity)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(ShoppingListView.this, "Pantry updated successfully.", Toast.LENGTH_SHORT).show();
+                            callback.onCheckCompleted(true);
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(ShoppingListView.this, "Failed to update pantry: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            callback.onCheckCompleted(false);
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ShoppingListView.this, "Failed to access database: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                callback.onCheckCompleted(false);
+            }
+        });
+    }
+
+
+    public interface IngredientCheckCallback {
+        void onCheckCompleted(boolean exists);
+    }
+
+    public interface PantryUpdateCallback {
+        void onUpdateCompleted(boolean success);
+    }
+
+    public void addIngredientToPantry2(String ingredientName, String quantity, String calories, String expirationDate, PantryUpdateCallback callback) {
+        String username = user.getUsername();
+        if (username != null && !username.isEmpty()) {
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Pantry").child(stripUsername());
+            DatabaseReference ingredientRef = userRef.child(ingredientName);
+
+            Map<String, Object> ingredientData = new HashMap<>();
+            ingredientData.put("quantity", quantity);
+            ingredientData.put("calories", calories);
+            ingredientData.put("expirationDate", expirationDate);
+
+            ingredientRef.setValue(ingredientData)
+                    .addOnSuccessListener(unused -> {
+                        Toast.makeText(ShoppingListView.this, "Ingredient added to Pantry.", Toast.LENGTH_SHORT).show();
+                        callback.onUpdateCompleted(true);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(ShoppingListView.this, "Failed to add ingredient to pantry: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        callback.onUpdateCompleted(false);
+                    });
+        } else {
+            Toast.makeText(ShoppingListView.this, "Username not set", Toast.LENGTH_SHORT).show();
+            callback.onUpdateCompleted(false);  // Notify callback of failure due to missing username
+        }
+    }
+
+
+
+
+    private String stripUsername() {
+        String username = User.getInstance().getUsername();
+        if (username != null && !username.isEmpty()) {
+            String sanitizedUsername = username.split("@")[0].replaceAll("[.#$\\[\\]]", "");
+            //DatabaseReference userRef = root.child(sanitizedUsername);
+            return sanitizedUsername;
+        }
+        return null;
+    }
+
     private void fetchIngredients(ShoppingListView.IngredientFetchCallback callback) {
         String username = User.getInstance().getUsername();
         if (username != null && !username.isEmpty()) {
@@ -85,36 +289,18 @@ public class ShoppingListView extends AppCompatActivity
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     List<ShoppingListModel> fetchedIngredients = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        //IngredientsModel ingredient = snapshot.getValue(IngredientsModel.class);
-                        String ingredientStr = snapshot.getKey();
-                        String quantityStr;
-                        Object quantityObj = snapshot.child("quantity").getValue();
-                        if (quantityObj instanceof Long || quantityObj instanceof Integer) {
-                            quantityStr = String.valueOf(quantityObj);
-                        } else if (quantityObj instanceof String) {
-                            // Here, you can directly use the string or attempt to parse it as
-                            // a long if necessary
-                            quantityStr = (String) quantityObj;
-                            try {
-                                long quantityLong = Long.parseLong(quantityStr);
-                                // If parsing is successful but you still need it as a string
-                                quantityStr = String.valueOf(quantityLong);
-                            } catch (NumberFormatException e) {
-                                // Handle the case where the string cannot be parsed to a long
-                                quantityStr = "Invalid Format"; // Adjust based on how you want
-                                // to handle this
-                            }
-                        } else {
-                            quantityStr = "Unknown Quantity"; // Adjust accordingly
-                        }
+                        try {
+                            String ingredientName = snapshot.getKey();
+                            String quantityStr = convertQuantity(snapshot.child("quantity").getValue());
+                            String caloriesStr = snapshot.child("calories").getValue(String.class);
+                            String expirationDateStr = snapshot.child("expirationDate").getValue(String.class);
 
-                        String caloriesStr = snapshot.child("calories").getValue(String.class);
-                        String expirationDateStr = snapshot.child("expirationDate")
-                                .getValue(String.class);
-                        ShoppingListModel ingredient = new ShoppingListModel(ingredientStr,
-                               quantityStr);
-                        if (ingredient != null) {
+                            ShoppingListModel ingredient = new ShoppingListModel(ingredientName, quantityStr, caloriesStr, expirationDateStr);
                             fetchedIngredients.add(ingredient);
+                        } catch (Exception e) {
+                            Log.e("ShoppingListView", "Error parsing ingredient data", e);
+                            callback.onError("Error parsing data for " + snapshot.getKey());
+                            return;
                         }
                     }
                     callback.onIngredientsFetched(fetchedIngredients);
@@ -122,12 +308,28 @@ public class ShoppingListView extends AppCompatActivity
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("ShoppingListView", "Database error: " + databaseError.getMessage());
                     callback.onError("Failed to load ingredients.");
                 }
             });
         } else {
             callback.onError("Username not set or invalid.");
         }
+    }
+
+    private String convertQuantity(Object quantityObj) {
+        if (quantityObj instanceof Long || quantityObj instanceof Integer) {
+            return String.valueOf(quantityObj);
+        } else if (quantityObj instanceof String) {
+            try {
+                // Convert to integer first to remove any decimals
+                return String.valueOf(Integer.parseInt((String) quantityObj));
+            } catch (NumberFormatException e) {
+                Log.e("ShoppingListView", "Failed to parse quantity: " + quantityObj, e);
+                return "Invalid Format";
+            }
+        }
+        return "Unknown";
     }
 
     private void initializeViews() {
@@ -145,12 +347,9 @@ public class ShoppingListView extends AppCompatActivity
         viewModel = new ViewModelProvider(this).get(ShoppingListViewModel.class);
 
         submitButton.setOnClickListener(v -> handleSubmitButtonClick());
-        Button scrollUpButton = findViewById(R.id.scrollUpButton1);
-        Button scrollDownButton = findViewById(R.id.scrollDownButton1);
-        scrollUpButton.setOnClickListener(v -> recyclerView.scrollBy(0, -150));
-        scrollDownButton.setOnClickListener(v -> recyclerView.scrollBy(0, 150));
-
     }
+
+
     private void handleSubmitButtonClick() {
         String ingredientName = ingredientNameEditText.getText().toString().trim();
         String quantity = quantityEditText.getText().toString().trim();
@@ -331,6 +530,8 @@ public class ShoppingListView extends AppCompatActivity
                     "Username not set", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.shopping_list);
